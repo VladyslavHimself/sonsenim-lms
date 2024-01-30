@@ -24,7 +24,8 @@
       "executor": "@nx/vite:dev-server",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "sonsenim-ui:build"
+        "buildTarget": "sonsenim-ui:build",
+        "proxyConfig": "apps/sonsenim-ui/proxy.conf.json"
       },
       "configurations": {
         "development": {

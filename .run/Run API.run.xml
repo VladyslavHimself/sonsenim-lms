@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run API" type="NxRunConfigurationType">
+    <option name="nx-projects" value="sonsenim-api" />
+    <option name="nx-targets" value="serve" />
+    <option name="nx-target-configuration" value="" />
+    <envs />
+    <option name="arguments" value="" />
+    <method v="2" />
+  </configuration>
+</component>

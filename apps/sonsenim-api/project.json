@@ -1,0 +1,52 @@
+{
+  "name": "sonsenim-api",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/sonsenim-api/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "target": "node",
+        "compiler": "tsc",
+        "outputPath": "dist/apps/sonsenim-api",
+        "main": "apps/sonsenim-api/src/main.ts",
+        "tsConfig": "apps/sonsenim-api/tsconfig.app.json",
+        "assets": ["apps/sonsenim-api/src/assets"],
+        "webpackConfig": "apps/sonsenim-api/webpack.config.js"
+      },
+      "configurations": {
+        "development": {},
+        "production": {}
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "sonsenim-api:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "sonsenim-api:build:development"
+        },
+        "production": {
+          "buildTarget": "sonsenim-api:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/sonsenim-api/jest.config.ts"
+      }
+    }
+  },
+  "tags": []
+}
