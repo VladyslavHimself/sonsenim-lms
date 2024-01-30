@@ -1,0 +1,29 @@
+{
+  "name": "sonsenim-ui-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/sonsenim-ui-e2e/src",
+  "targets": {
+    "e2e": {
+      "executor": "@nx/cypress:cypress",
+      "options": {
+        "cypressConfig": "apps/sonsenim-ui-e2e/cypress.config.ts",
+        "testingType": "e2e",
+        "devServerTarget": "sonsenim-ui:serve"
+      },
+      "configurations": {
+        "production": {
+          "devServerTarget": "sonsenim-ui:serve:production"
+        },
+        "ci": {
+          "devServerTarget": "sonsenim-ui:serve-static"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  },
+  "implicitDependencies": ["sonsenim-ui"],
+  "tags": []
+}
