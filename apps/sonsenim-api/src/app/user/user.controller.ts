@@ -5,7 +5,7 @@ import {
   Body,
   Patch,
   Param,
-  Delete, ParseIntPipe, HttpException, HttpCode, HttpStatus, UsePipes, ValidationPipe
+  Delete, ParseIntPipe, HttpException, HttpStatus
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -15,7 +15,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @UsePipes(new ValidationPipe({whitelist: true}))
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
@@ -31,7 +30,7 @@ export class UserController {
     if (1 === id) {
       throw new HttpException('Ty pidaras', HttpStatus.BAD_GATEWAY);
     }
-    return this.userService.findOne(id);
+    return this.userService.findOne({ id });
   }
 
   @Patch(':id')
