@@ -1,7 +1,14 @@
-import { createFileRoute } from '@tanstack/react-router';
-
+import { createFileRoute, redirect } from '@tanstack/react-router';
 export const Route = createFileRoute('/')({
   component: Index,
+  beforeLoad: function() {
+    const userToken = localStorage.getItem('userToken')
+    if (!userToken) {
+      throw redirect({
+        to: '/login',
+      })
+    }
+  }
 })
 
 function Index() {
