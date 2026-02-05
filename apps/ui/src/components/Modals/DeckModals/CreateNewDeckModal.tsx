@@ -40,12 +40,12 @@ export default function CreateNewDeckModal({ groupId, modal }: Props) {
                           }))}
                     >
                         <ModalFormFieldInput
-                            name="deckName" form={form.control}
+                            name="name" form={form.control}
                             label="Deck Name" isRequired
                             placeholder="Animals and fruits"
                         />
                         <Separator className="my-6 h-1 bg-[#F0F0F0]" />
-                        <ModesToggleGroup defaultValues={['flashcardNormal']} form={form} />
+                        <ModesToggleGroup defaultValues={['isModeNormal']} form={form} />
                     </form>
                 </Form>
             </ModalBoxBody>

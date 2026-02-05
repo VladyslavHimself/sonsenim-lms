@@ -5,8 +5,8 @@ import {z} from "zod";
 //      Add description and image drop-place after realization in server-side
 
 export const deckConfigurationFieldsSchema = z.object({
-    deckName: z.string().min(4),
-    isFlashcardNormal: z.any().default(true),
-    isFlashcardReversed: z.any().default(false),
-    isFlashcardTyping: z.any().default(false),
+    name: z.string().min(4),
+    isModeNormal: z.any().default(true),
+    isModeReversed: z.any().default(false),
+    isModeTyping: z.any().default(false),
 });

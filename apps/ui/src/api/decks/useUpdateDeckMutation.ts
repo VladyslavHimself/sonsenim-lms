@@ -1,18 +1,18 @@
 import {useMutation} from "@tanstack/react-query";
 import {DecksApi} from "@/api/decks/decks.ts";
 import {toast} from "@/components/ui/use-toast.ts";
-import {DeckConfigurationBody} from "@sonsenim/contracts";
+import {DeckResponse} from "@sonsenim/contracts";
 
 
 export type EditDeckMutationVariables = {
-    deckId: number,
-    deckConfiguration: DeckConfigurationBody
+    deckId: string,
+    deckConfiguration: DeckResponse
 }
 
 export default function useUpdateDeckMutation(callback: Function) {
     const { mutate: updateDeck } = useMutation({
         mutationKey: ['update-deck'],
-        mutationFn: ({ deckId, deckConfiguration}: EditDeckMutationVariables) => DecksApi.updateDeck(deckId, deckConfiguration),
+        mutationFn: ({ deckId, deckConfiguration }: EditDeckMutationVariables) => DecksApi.updateDeck(deckId, deckConfiguration),
         onSuccess: (data, variables, context) => {
             callback(data, variables, context);
         },

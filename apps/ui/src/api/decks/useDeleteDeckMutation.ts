@@ -6,7 +6,7 @@ import {toast} from "@/components/ui/use-toast.ts";
 export default function useDeleteDeckMutation(callback: Function) {
     const { mutate: deleteDeck } = useMutation({
         mutationKey: ['delete-deck'],
-        mutationFn: (deckId: number) => DecksApi.deleteDeck(deckId),
+        mutationFn: (deckId: string) => DecksApi.deleteDeck(deckId),
         onSuccess: (data, variables, context) => {
             callback(data, variables, context);
         },

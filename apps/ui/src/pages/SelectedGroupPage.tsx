@@ -9,12 +9,12 @@ import Card from "@/components/Card/Card.tsx";
 import DeckCardMenubar from "@/components/DeckCardMenubar/DeckCardMenubar.tsx";
 import CreateNewDeckModal from "@/components/Modals/DeckModals/CreateNewDeckModal.tsx";
 import {useState} from "react";
-import {DeckWithAggregatedDataResponse} from "@/api/decks/decks.ts";
 import useQuicksearch from "@/hooks/useQuicksearch.ts";
 import PageHeaderSectionTitle
     from "@/components/Dashboard/DashboardHeaderSection/PageHeaderSectionTitle/PageHeaderSectionTitle.tsx";
 import {useMediaQuery} from "react-responsive";
 import {Modal} from "@/ModalBox/modalBox.ts";
+import {DecksStatsResponse} from "@sonsenim/contracts";
 
 export default function SelectedGroupPage() {
     const isMobile = useMediaQuery({query: "(max-width: 700px)"});
@@ -23,7 +23,7 @@ export default function SelectedGroupPage() {
     const {groupId} = useParams();
     const {aggregatedDecks, refetch} = useAggregatedDecks(groupId!);
     const [searchInput, setSearchInput] = useState('');
-    const filteredDecks = useQuicksearch<DeckWithAggregatedDataResponse>(aggregatedDecks!, ['deckName'], searchInput);
+    const filteredDecks = useQuicksearch<DecksStatsResponse>(aggregatedDecks!, ['name'], searchInput);
 
 
     // TODO: Make context for header || HARDCODED

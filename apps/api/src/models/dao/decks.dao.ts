@@ -20,31 +20,33 @@ export const DecksDAO = {
     add: async (groupId: string, body: Partial<Deck>) => {
         return dbIns`INSERT INTO decks (group_id, name, is_mode_typing, is_randomized_order, is_mode_reversed,
                                         is_mode_normal)
-                     VALUES (${groupId}, ${body.deckName}, ${body.isFlashcardTyping}, ${body.isRandomizedOrder},
-                             ${body.isFlashcardReversed}, ${body.isFlashcardNormal})`;
+                     VALUES (${groupId}, ${body.name}, ${body.isModeTyping}, ${body.isRandomizedOrder},
+                             ${body.isModeReversed}, ${body.isModeNormal})`;
     },
 
     findById: async (deckId: string) => {
-        const rows = await dbIns`SELECT * FROM decks WHERE id = ${deckId}`;
+        const rows = await dbIns`SELECT *
+                                 FROM decks
+                                 WHERE id = ${deckId}`;
         return rows[0] ?? null;
     },
 
     update: async (deckId: string, body: Partial<Deck>) => {
         // TODO: Change to dynamic fields updating
         return dbIns`UPDATE decks
-                     SET name                = ${body.deckName}
-                       , is_mode_normal      = ${body.isFlashcardNormal}
-                       , is_mode_reversed    = ${body.isFlashcardReversed}
+                     SET name                = ${body.name}
+                       , is_mode_normal      = ${body.isModeNormal}
+                       , is_mode_reversed    = ${body.isModeReversed}
                        , is_randomized_order = ${body.isRandomizedOrder}
-                       , is_mode_typing      = ${body.isFlashcardTyping}
+                       , is_mode_typing      = ${body.isModeTyping}
                      WHERE id = ${deckId}
                      RETURNING *
         `;
     },
 
     delete: async (deckId: string) => {
-       return dbIns`DELETE
-                    FROM decks
-                    WHERE id = ${deckId}`;
+        return dbIns`DELETE
+                     FROM decks
+                     WHERE id = ${deckId}`;
     }
 };

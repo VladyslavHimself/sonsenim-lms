@@ -4,7 +4,7 @@ import {deckConfigurationFieldsSchema} from "@/components/Modals/DeckModals/deck
 import {Separator} from "@radix-ui/react-separator";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {DeckModes, DeckWithAggregatedDataResponse} from "@/api/decks/decks.ts";
+import {DeckModes} from "@/api/decks/decks.ts";
 import {useMemo} from "react";
 import useUpdateDeckMutation, {EditDeckMutationVariables} from "@/api/decks/useUpdateDeckMutation.ts";
 import useDeleteDeckMutation from "@/api/decks/useDeleteDeckMutation.ts";
@@ -13,22 +13,27 @@ import ModalFormFieldInput from "@/components/Modals/ui/ModalFormFieldInput/Moda
 import {ModesToggleGroup} from "@/components/Modals/ui/ModesToggleGroup/ModesToggleGroup.tsx";
 import {ModalInstance} from "@/ModalBox/modalBox.ts";
 import {ModalBoxBody, ModalBoxConfirmationFooter} from "@/ModalBox/ModalBoxTemplates.tsx";
+import {DecksStatsResponse} from "@sonsenim/contracts";
 type Props = {
-    deckProperties: DeckWithAggregatedDataResponse,
+    deckProperties: DecksStatsResponse,
     refetchDecks: () => void,
     modal: ModalInstance
 }
+
+type deckConfigurationFieldsSchemaTypes = z.infer<typeof deckConfigurationFieldsSchema>;
+
 export default function EditDeckModal({ deckProperties, refetchDecks, modal }: Props) {
     const { deleteDeck } = useDeleteDeckMutation(onMakeModalAction);
     const { updateDeck } = useUpdateDeckMutation(onMakeModalAction);
 
-    const form = useForm<z.infer<typeof deckConfigurationFieldsSchema>>({
+
+    const form = useForm<deckConfigurationFieldsSchemaTypes>({
         resolver: zodResolver(deckConfigurationFieldsSchema),
         defaultValues: {
-            deckName: deckProperties.deckName,
-            isFlashcardNormal: deckProperties.isFlashcardNormal,
-            isFlashcardReversed: deckProperties.isFlashcardReversed,
-            isFlashcardTyping: deckProperties.isFlashcardTyping
+            name: deckProperties.name,
+            isModeNormal: deckProperties.isModeNormal,
+            isModeReversed: deckProperties.isModeReversed,
+            isModeTyping: deckProperties.isModeTyping
         }
     });
 
@@ -40,7 +45,6 @@ export default function EditDeckModal({ deckProperties, refetchDecks, modal }: P
                 defValues.push(key);
             }
         }
-
         return defValues;
     }, [deckProperties]);
 
@@ -49,13 +53,15 @@ export default function EditDeckModal({ deckProperties, refetchDecks, modal }: P
             <ModalBoxBody>
                 <Form {...form}>
                     <form id="edit-deck-form"
-                          onSubmit={form.handleSubmit((values: z.infer<typeof deckConfigurationFieldsSchema>) => updateDeck({
-                              deckId: deckProperties.id,
-                              deckConfiguration: Object.assign(values, { isRandomizedOrder: true })
-                          } as EditDeckMutationVariables))}
+                          onSubmit={form.handleSubmit((values: z.infer<typeof deckConfigurationFieldsSchema>) => {
+                              updateDeck({
+                                  deckId: deckProperties.id,
+                                  deckConfiguration: Object.assign(values, {isRandomizedOrder: true})
+                              } as EditDeckMutationVariables);
+                          })}
                     >
                         <ModalFormFieldInput
-                            name="deckName" form={form.control}
+                            name="name" form={form.control}
                             label="Deck Name" isRequired
                             placeholder="Animals and fruits"
                         />

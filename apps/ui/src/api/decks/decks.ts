@@ -1,23 +1,7 @@
 import axios from "axios";
-import {DeckConfigurationBody} from "@sonsenim/contracts";
+import {DeckConfigurationBody, DeckResponse, DecksStatsResponse} from "@sonsenim/contracts";
 
-export type DeckModes = {
-    isFlashcardNormal: boolean;
-    isFlashcardReversed: boolean;
-    isFlashcardTyping: boolean;
-    isRandomizedOrder: boolean;
-}
-
-export type Deck = {
-    id: number;
-    name: string;
-    createdAt: string;
-} & DeckModes;
-
-export type DeckWithAggregatedDataResponse = Deck & {
-    cardsInDeckTotal: number;
-    dueCardsInDeck: number;
-}
+export type DeckModes = Pick<DeckResponse, 'isModeReversed' | 'isModeNormal' | 'isModeTyping'>
 
 export const DecksApi = {
     getDeckById(deckId: string) {
@@ -25,18 +9,19 @@ export const DecksApi = {
     },
 
     getDecksWithAggregatedData(groupId: string) {
-        return axios.get<DeckWithAggregatedDataResponse[]>(`/api/decks/stats/${groupId}`);
+        return axios.get<DecksStatsResponse[]>(`/api/decks/stats/${groupId}`);
     },
 
     addDeckToGroup(groupId: string, deckConfiguration: DeckConfigurationBody) {
         return axios.post(`/api/decks/${groupId}`, deckConfiguration)
     },
 
-    updateDeck(groupId: number, deckConfiguration: DeckConfigurationBody) {
-        return axios.put(`/api/decks/${groupId}`, deckConfiguration);
+    updateDeck(deckId: string, deckConfiguration: DeckResponse) {
+        console.log('conf', deckConfiguration);
+        return axios.put(`/api/decks/${deckId}`, deckConfiguration);
     },
 
-    deleteDeck(deckId: number) {
+    deleteDeck(deckId: string) {
         return axios.delete(`/api/decks/${deckId}`);
     }
 }

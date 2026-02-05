@@ -6,6 +6,6 @@ const _aggregatedFieldsSchema = z.object({
     dueCardsInDeck: z.number()
 });
 
-export const decksStatsResponseDto = z.union([DeckResponseSchema, _aggregatedFieldsSchema])
+export const decksStatsResponseDto = DeckResponseSchema.merge(_aggregatedFieldsSchema)
 
 export type DecksStatsResponse = z.infer<typeof decksStatsResponseDto>;
