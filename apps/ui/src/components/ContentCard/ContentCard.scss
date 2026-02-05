@@ -1,0 +1,39 @@
+.content-card {
+    width: 200px;
+    height: 100px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    border-radius: 12px;
+    background-color: #EDEDED;
+    padding: 0 15px;
+
+
+    .dashboard-content-strip > &:last-child {
+        margin-left: 10px;
+    }
+
+    .profile-page-content-strip > & {
+        margin: 10px 20px 10px 0;
+    }
+
+    @media screen and (max-width: 600px) {
+        .profile-page-content-strip > & {
+            width: 100%;
+            margin: 10px 0;
+        }
+    }
+
+    .content-card-information {
+        color: #F18C29;
+        font-family: "Gilroy Medium", sans-serif;
+        font-size: 24px;
+    }
+
+    .content-card-title {
+        font-family: "Gilroy Medium", sans-serif;
+        font-size: 18px;
+    }
+}

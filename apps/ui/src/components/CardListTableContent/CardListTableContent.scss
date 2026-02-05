@@ -1,0 +1,60 @@
+
+
+.card-list-table-content {
+    height: 100%;
+    width: 100%;
+
+    // TODO: Add padding for header to remove unnecessary margins in content area
+    margin-top: 30px;
+
+    overflow: auto;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    &.is-mobile {
+        margin-top: 0;
+    }
+}
+
+
+// TODO: Organize when main part will be done
+.data-table-cell {
+    height: 60px;
+    display: flex;
+    flex-direction: column;
+    text-transform: capitalize;
+    font-size: 20px;
+
+    justify-content: space-evenly;
+
+    @media screen and (max-width: 600px) {
+        font-size: 16px;
+    }
+
+    .data-table-cell-primary-word-cell {
+        font-family: "Gilroy Medium", sans-serif;
+    }
+
+    .data-table-cell-definition-cell {
+        font-family: "Gilroy Regular", sans-serif;
+        font-size: 16px;
+        margin-top: 5px;
+        color: #989898;
+    }
+
+
+}
+
+.popup-menu-card-button {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+
+    &.remove-button {
+        color: red;
+    }
+}
+
+

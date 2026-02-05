@@ -1,0 +1,50 @@
+.mobile-navbar {
+    position: fixed;
+    top: 95%;
+    left: 50%;
+    transform: translate(-50%, -95%);
+    width: 350px;
+    height: 75px;
+
+    background-color: #EFEFEF;
+    border-radius: 19px;
+
+    z-index: 999;
+    padding: 10px 12px;
+
+    display: flex;
+    justify-content: space-between;
+
+    .mobile-navbar-item {
+        width: 55px;
+        height: 55px;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        border-radius: 9px;
+
+        &.is-action-button {
+            background-color: #E86F26;
+            border-radius: 100%;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        svg {
+            width: 30px;
+            height: 30px;
+        }
+
+        &.mobile-navbar-item-active-tab {
+            background-color: #EAEAEA;
+
+            svg {
+                width: 30px;
+                height: 30px;
+                color: #E86F26;
+            }
+        }
+    }
+}

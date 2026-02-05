@@ -1,0 +1,81 @@
+.dashboard-content-section {
+    height: 100%;
+    margin-top: 30px;
+
+    .dashboard-content-strip {
+        width: 100%;
+        display: flex;
+    }
+
+    .weekly-report-chart-container {
+        display: inline-flex;
+        margin-top: 15px;
+        width: 100%;
+        max-width: 800px;
+        background-color: #ECECEC;
+        border-radius: 11px;
+        flex-direction: column;
+
+        padding: 10px;
+
+        .weekly-report-chart-legend {
+            padding: 0;
+        }
+    }
+
+    .weekly-report-chart-legend {
+        display: flex;
+        padding: 20px;
+        background-color: #ECECEC;
+        border-radius: 13px;
+
+        @media screen and (max-width: 600px) {
+            display: flex;
+            justify-content: space-between;
+        }
+
+
+        width: 100%;
+        .weekly-report-chart-legend-item {
+            font-size: 20px;
+
+            &:not(:first-child) { margin-left: 25px; }
+
+            &:nth-child(1) { color: #50a121; }
+            &:nth-child(2) { color: #E82626; }
+            &:nth-child(3) { color: #E1BD00; }
+            &:nth-child(4) { color: #9D00D5; }
+
+            div:nth-child(1) {
+                font-family: "Gilroy Medium", sans-serif;
+            }
+
+            div:nth-child(2) {
+                font-family: "Gilroy Regular", sans-serif;
+            }
+        }
+
+
+        @media screen and (max-width: 600px) {
+            & {
+                font-size: 20px;
+            }
+        }
+    }
+
+    .weekly-report-chart {
+        //width: 100%;
+        max-width: 1093px;
+        padding: 15px;
+        margin-left: -30px;
+    }
+
+    h1, h2 { font-family: "Gilroy Medium", sans-serif; }
+
+    h1 { font-size: 32px; }
+
+    h2 {
+        margin-top: 35px;
+        font-size: 24px;
+    }
+}

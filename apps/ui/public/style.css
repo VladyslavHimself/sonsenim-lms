@@ -1,0 +1,23 @@
+@font-face {
+    font-family: "Gilroy Regular";
+    src: local('Gilroy-Regular'), url("Gilroy-Regular.ttf") format("ttf");
+}
+
+@font-face {
+    font-family: "Gilroy Medium";
+    src: local('Gilroy-Medium'), url("Gilroy-Medium.ttf") format("ttf");
+}
+
+@font-face {
+    font-family: "Gilroy Light";
+    src: local('Gilroy-Light'), url("Gilroy-Light.ttf") format("ttf");
+}
+
+@font-face {
+    font-family: "Gilroy Heavy";
+    src: local('Gilroy-Heavy'), url("Gilroy-Heavy.ttf") format("ttf");
+}
+@font-face {
+    font-family: "Gilroy Bold";
+    src: local('Gilroy-Bold'), url("Gilroy-Bold.ttf") format("ttf");
+}

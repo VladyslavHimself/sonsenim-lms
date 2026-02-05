@@ -1,0 +1,20 @@
+.modes-toggle-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  > span {
+    font-size: 18px;
+    color: #868686;
+    margin-bottom: 10px;
+  }
+
+  .modes-toggle-group-item {
+    border: none;
+    background-color: rgba(219, 219, 219, 0.24);
+
+    &[data-state="on"] {
+      background-color: rgba(255, 144, 38, 0.27);
+    }
+  }
+}

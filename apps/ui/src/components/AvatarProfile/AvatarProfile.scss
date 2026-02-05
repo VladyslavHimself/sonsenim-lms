@@ -1,0 +1,42 @@
+.avatar-profile {
+  display: flex;
+  align-items: center;
+
+  > span {
+    font-size: 18px;
+    margin: 0 15px 0 5px;
+  }
+}
+
+@media screen and (max-width: 825px) {
+  .avatar-profile-username {
+      display: none;
+    }
+}
+
+.profile-popover {
+  background-color: #ECECEC !important;
+  border-radius: 13px !important;
+  padding: 7px 6px !important;
+  display: flex;
+  flex-direction: column;
+
+  button {
+    margin: 0 0 5px 0;
+    border-radius: 9px;
+    font-family: "Gilroy Regular", sans-serif;
+    font-size: 18px;
+    display: flex;
+    justify-content: flex-start;
+    box-sizing: content-box;
+
+
+    &:hover {
+      background-color: rgba(25, 25, 25, 0.1);
+    }
+
+    svg {
+      margin-right: 10px;
+    }
+  }
+}

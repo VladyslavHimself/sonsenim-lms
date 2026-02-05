@@ -1,0 +1,4 @@
+export const PACE_REPETITION_INTERVAL = [
+    0.25, 1, 3, 7, 14, 30, 90, 180, 360
+]
+export const PACE_REPETITION_INTERVAL_MIN = 0.25;

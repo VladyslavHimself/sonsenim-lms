@@ -1,0 +1,36 @@
+// TODO: Rename styles to actual names
+
+.cardsList-content-section {
+    height: 100%;
+    margin-top: 30px;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+    padding: 10px 5px;
+
+    .cardsList-content-section-header {
+        width: 100%;
+        height: 70px;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 20px;
+        h1 { font-size: 32px; }
+    }
+
+    .cardList-content-section-cards {
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        overflow: auto;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+
+
+}

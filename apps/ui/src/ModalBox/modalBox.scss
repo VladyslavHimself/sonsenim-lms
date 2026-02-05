@@ -1,0 +1,100 @@
+.modal-root {
+
+  .modal-backdrop {
+    z-index: 1201;
+    background-color: rgba(#000, 0.2);
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+  }
+
+  .modal-box {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1202;
+    overflow: auto;
+    // TODO: Check other modals later
+    margin: 0 auto;
+
+    .modal-box-container {
+      position: relative;
+      max-width: 650px;
+      width: 90%;
+      margin: 100px auto auto;
+      background-color: #f4f4f4;
+      border-radius: 12px;
+
+      .modal-box-header {
+        padding: 25px 50px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        font-family: "Gilroy Medium", sans-serif;
+        font-size: 24px;
+
+
+        @media screen and (max-width: 440px) {
+          & {
+            padding: 25px 20px;
+            font-size: 20px;
+          }
+        }
+      }
+
+      .modal-box-body {
+        width: 100%;
+        padding: 0 50px;
+        min-height: 78px;
+
+        display: flex;
+        flex-direction: column;
+
+        @media screen and (max-width: 440px) {
+          & {
+            padding: 0 20px;
+          }
+        }
+      }
+    }
+
+    .modal-box-footer {
+      display: flex;
+      padding: 25px 50px 35px 50px;
+
+      @media screen and (max-width: 440px) {
+        & {
+          padding: 25px 20px 35px 20px;
+        }
+      }
+
+
+      &.modal-box-confirm-footer {
+        padding: 25px 0 35px 0;
+      }
+
+      .modal-box-cancel-button {
+        background-color: #FF7474;
+        flex: 0 1 45px;
+        padding: 25px 20px;
+        border-radius: 12px;
+
+        margin-right: 25px;
+      }
+
+      .modal-box-submit-button {
+        width: 100%;
+        font-family: 'Gilroy Bold', sans-serif;
+        font-size: 18px;
+        padding: 25px;
+        border-radius: 12px;
+      }
+    }
+  }
+
+}

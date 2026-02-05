@@ -1,0 +1,6 @@
+# pnpm-workspace.yaml
+packages:
+  # all packages in subdirectories of packages/
+  - 'packages/*'
+  # optional: you can also include applications in an apps folder
+  - 'apps/*'

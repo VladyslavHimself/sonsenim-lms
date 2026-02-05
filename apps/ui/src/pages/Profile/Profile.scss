@@ -1,0 +1,80 @@
+.profile-page {
+    .profile-page-user-header {
+        display: flex;
+        .user-info-avatar {
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            svg {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        .user-info-content {
+            .user-info-content-fullname {
+                font-family: "Gilroy Medium", sans-serif;
+                font-size: 32px;
+            }
+
+            .user-info-content-email {
+                font-family: "Gilroy Light", sans-serif;
+                font-size: 24px;
+            }
+        }
+    }
+
+    .profile-page-group-section {
+        max-width: 638px;
+        width: 100%;
+        background-color: #EDEDED;
+        border-radius: 13px;
+        margin-top: 20px;
+
+        padding: 18px 24px;
+
+        display: flex;
+        flex-direction: column;
+
+
+        .profile-page-group-section-header {
+            font-size: 20px;
+            font-family: "Gilroy-SemiBold", sans-serif;
+            padding-bottom: 20px;
+        }
+        .profile-page-group-section-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .profile-page-group-premium-button {
+                padding: 25px 40px;
+
+                @media screen and (max-width: 600px) {
+                    & {
+                        padding: 25px 25px;
+                    }
+                }
+            }
+            
+
+
+            .profile-page-group-section-item {
+                font-family: "Gilroy Regular", sans-serif;
+                font-size: 18px;
+                padding-bottom: 5px;
+            }
+
+
+            span {
+                font-family: "Gilroy Medium", sans-serif;
+            }
+        }
+    }
+
+    .profile-page-content-strip {
+        display: flex;
+        margin-top: 15px;
+        flex-wrap: wrap;
+    }
+}

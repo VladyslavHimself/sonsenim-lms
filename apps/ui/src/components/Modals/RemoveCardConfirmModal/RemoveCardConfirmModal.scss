@@ -1,0 +1,19 @@
+.remove-card-confirm-modal {
+  p {
+    font-family: "Gilroy Regular", sans-serif;
+    font-size: 20px;
+    line-height: 1.5;
+    color: #626262;
+  }
+}
+
+.remove-card-confirm-modal-button {
+  background-color: #FF7474;
+  height: 50px;
+
+  margin: 20px 0;
+
+  &:hover {
+    background-color: #e36767;
+  }
+}

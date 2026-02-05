@@ -1,0 +1,24 @@
+{
+  "name": "api",
+  "type": "module",
+  "scripts": {
+    "start": "bun run main.ts",
+    "pg-migrate": "node-pg-migrate",
+    "typecheck": "tsc"
+  },
+  "devDependencies": {
+    "@types/bun": "1",
+    "typescript": "5"
+  },
+  "dependencies": {
+    "@elysiajs/cookie": "^0.8.0",
+    "@elysiajs/cors": "^1.4.0",
+    "@elysiajs/jwt": "^1.4.0",
+    "@elysiajs/openapi": "^1.4.12",
+    "@sonsenim/contracts": "workspace:*",
+    "argon2": "^0.44.0",
+    "bcryptjs": "^3.0.3",
+    "elysia": "1",
+    "node-pg-migrate": "^8.0.4"
+  }
+}

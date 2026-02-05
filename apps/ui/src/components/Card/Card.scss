@@ -1,0 +1,105 @@
+.group-card {
+  width: 300px;
+  height: 110px;
+  background-color: #EDEDED;
+  border-radius: 12px;
+
+  transition: .3s ease;
+
+  cursor: pointer;
+
+  display: flex;
+
+  position: relative;
+
+  margin: 20px 20px 20px 0;
+
+
+  @media screen and (max-width: 600px) {
+    & {
+      width: 100%;
+      margin: 10px 0;
+    }
+  }
+
+
+  // TODO: Find solution to simplify it
+  &[data-notification-message]:not([data-notification-message="0"]):after {
+    content: attr(data-notification-message);
+    position: absolute;
+    top: -10%;
+    left: 105%;
+
+    transform: translate(-105%, -10%);
+
+    width: 35px;
+    height: 35px;
+    border-radius: 100%;
+    background-color: #FF6F6D;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+
+    font-size: 14px;
+    font-family: "Gilroy Medium", sans-serif;
+    letter-spacing: 1px;
+
+    @media screen and (max-width: 600px) {
+      & {
+        top: 15%;
+        left: 98%;
+        transform: translate(-98%, -15%);
+      }
+    }
+  }
+
+
+  &:hover {
+    background-color: #e1e1e1;
+  }
+
+  .group-card-info {
+    padding: 18px 24px;
+
+    flex: 1 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+
+
+    .group-card-info-title {
+      display: flex;
+      align-items: center;
+
+      > div { padding-right: 15px; }
+    }
+
+    div:nth-child(1) {
+      font-family: "Gilroy Medium", sans-serif;
+      font-size: 20px;
+    }
+
+    div:nth-child(2) {
+      font-family: "Gilroy Regular", sans-serif;
+      font-size: 18px;
+    }
+
+  }
+
+  .group-card-image {
+    flex-basis: 100px;
+    height: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    img {
+      width: 62px;
+      height: 62px;
+      border-radius: 10%;
+    }
+  }
+}

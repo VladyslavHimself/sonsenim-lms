@@ -1,0 +1,25 @@
+@mixin set-level-background($color, $count) {
+  @for $i from 1 through $count {
+    & > div:nth-child(#{$i}) {
+      background-color: $color;
+    }
+  }
+}
+
+.level-indicator {
+  & > div { background-color: #D9D9D9; width: 5px; margin-left: 2px }
+
+  display: flex;
+  align-items: flex-end;
+
+  @for $i from 1 through 4 {
+    div:nth-child(#{$i}) {
+      height: 5px * $i;
+    }
+  }
+
+  &[data-level="Very low"] { @include set-level-background(#50a121, 1); }
+  &[data-level="Low"] { @include set-level-background(#E82626, 2); }
+  &[data-level="Medium"] { @include set-level-background(#E1BD00, 3); }
+  &[data-level="High"] { @include set-level-background(#9D00D5, 4); }
+}

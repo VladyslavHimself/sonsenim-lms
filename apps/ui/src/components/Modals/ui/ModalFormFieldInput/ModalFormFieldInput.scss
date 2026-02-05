@@ -1,0 +1,20 @@
+.modal-form-field-input-label {
+    font-family: "Gilroy Regular", sans-serif;
+    font-size: 20px;
+
+    @media screen and (max-width: 440px) {
+        font-size: 18px;
+    }
+}
+
+.modal-form-field-input {
+
+    @media screen and (max-width: 440px) {
+        height: 50px;
+    }
+
+    &::placeholder {
+        font-family: "Gilroy Light", sans-serif;
+        color: #B9B9B9;
+    }
+}

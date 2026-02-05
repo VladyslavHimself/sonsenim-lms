@@ -1,0 +1,12 @@
+{
+  "name": "@sonsenim/contracts",
+  "version": "0.1.0",
+  "main": "index.ts",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "devDependencies": {
+    "zod": "^3.22.4"
+  }
+}

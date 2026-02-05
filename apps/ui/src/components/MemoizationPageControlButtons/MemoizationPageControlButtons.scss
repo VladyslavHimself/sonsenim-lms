@@ -1,0 +1,39 @@
+.memoization-page {
+    .memoization-page-buttons {
+        height: 100px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+
+        .memoization-button {
+            padding: 30px 65px;
+            margin: 0 15px;
+
+            svg {
+                width: 32px;
+                height: 32px;
+            }
+
+            &.fail-button {
+                background-color: #FF7474;
+
+                &:hover {
+                    background-color: #e66060;
+                }
+            }
+
+            &.success-button {
+                background-color: #8AE899;
+
+                &:hover {
+                    background-color: #74d281;
+                }
+            }
+
+            &.continue-button {
+                background-color: #749DB3;
+            }
+        }
+    }
+}
