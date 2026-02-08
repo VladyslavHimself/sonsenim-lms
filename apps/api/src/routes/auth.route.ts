@@ -47,7 +47,7 @@ export const authRoutes = new Elysia({
             secure: true,
             sameSite: 'strict',
             path: '/',
-            maxAge: 60 ** 3 * 15
+            maxAge: 60 ** 3 * 15 // #TODO: Change later
         })
 
         return {ok: true}
