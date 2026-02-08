@@ -45,7 +45,7 @@ export const authRoutes = new Elysia({
             value: token,
             httpOnly: true,
             secure: true,
-            sameSite: 'strict',
+            sameSite: 'none', // disabled for cloudflare (without sameOrigin proxy)
             path: '/',
             maxAge: 60 ** 3 * 15 // #TODO: Change later
         })
@@ -60,7 +60,7 @@ export const authRoutes = new Elysia({
             value: '',
             httpOnly: true,
             secure: true,
-            sameSite: 'strict',
+            sameSite: 'none', // disabled for cloudflare (without sameOrigin proxy)
             path: '/',
             maxAge: 0
         })

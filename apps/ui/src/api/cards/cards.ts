@@ -1,5 +1,6 @@
-import axios from "axios";
 import {CardConfigurationBody, UpdateCurveConfigurationBody} from "@sonsenim/contracts";
+import {RESOURCE_SERVER_URL} from "@/constants/resource.ts";
+import {axiosInstance} from "@/api/axiosInstance.ts";
 
 export type Card = {
     cardId: number,
@@ -13,29 +14,29 @@ export type Card = {
 
 const CardsApi = {
     addCardToDeck(deckId: number, newCardConfiguration: CardConfigurationBody) {
-        return axios.post(`/api/cards/${deckId}`, newCardConfiguration);
+        return axiosInstance.post(`${RESOURCE_SERVER_URL}/api/cards/${deckId}`, newCardConfiguration);
     },
 
     getCardsToRepeatFromDeck(deckId: string) {
-        return axios.get<Card[]>(`/api/cards/${deckId}/to-repeat`);
+        return axiosInstance.get<Card[]>(`${RESOURCE_SERVER_URL}/api/cards/${deckId}/to-repeat`);
     },
 
 
     // TODO: Change id params to string in other areas
     getCardsInDeck(deckId: string) {
-        return axios.get<Card[]>(`/api/cards/${deckId}`);
+        return axiosInstance.get<Card[]>(`${RESOURCE_SERVER_URL}/api/cards/${deckId}`);
     },
 
     updateCard(cardId: string, deckId: string, cardConfiguration: CardConfigurationBody) {
-        return axios.put(`/api/cards/${deckId}/${cardId}`, cardConfiguration);
+        return axiosInstance.put(`${RESOURCE_SERVER_URL}/api/cards/${deckId}/${cardId}`, cardConfiguration);
     },
 
     removeCardFromDeck(deckId: string, cardId: string) {
-        return axios.delete(`/api/cards/${deckId}/${cardId}`);
+        return axiosInstance.delete(`${RESOURCE_SERVER_URL}/api/cards/${deckId}/${cardId}`);
     },
 
     updateCardTimeCurve(cardId: string, configuration: UpdateCurveConfigurationBody) {
-        return axios.patch(`/api/cards/${cardId}/update-curve`, configuration);
+        return axiosInstance.patch(`${RESOURCE_SERVER_URL}/api/cards/${cardId}/update-curve`, configuration);
     }
 };
 

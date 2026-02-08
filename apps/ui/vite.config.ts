@@ -61,12 +61,12 @@ export default defineConfig({
             "@": path.resolve(__dirname, "./src"),
         },
     },
-    server: {
-        proxy: {
-            '/api': {
-                target: "https://api.sonsennim.com/v1/",
-                changeOrigin: true
-            }
-        }
-    },
+    // server: {
+    //     proxy: {
+    //         '/api': {
+    //             target: "http://localhost:8787/v1",
+    //             changeOrigin: true
+    //         }
+    //     }
+    // },
 })

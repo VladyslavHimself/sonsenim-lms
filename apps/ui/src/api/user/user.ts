@@ -1,4 +1,5 @@
-import axios from "axios";
+import {RESOURCE_SERVER_URL} from "@/constants/resource.ts";
+import {axiosInstance} from "@/api/axiosInstance.ts";
 
 
 export type UserProfileResponse = {
@@ -20,11 +21,11 @@ export type UserInfoResponse = {
 
 const UserApi = {
     getLoggedInUserProfile() {
-        return axios.get<UserProfileResponse>('/api/user-info/me');
+        return axiosInstance.get<UserProfileResponse>(`${RESOURCE_SERVER_URL}/api/user-info/me`);
     },
 
     getUserInfo() {
-        return axios.get<UserInfoResponse>('/api/user/me');
+        return axiosInstance.get<UserInfoResponse>(`${RESOURCE_SERVER_URL}/api/user/me`);
     }
 }
 

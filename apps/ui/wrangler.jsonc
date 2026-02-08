@@ -1,0 +1,11 @@
+{
+  "name": "sonsenim-ui",
+  "compatibility_date": "2026-02-05",
+  "pages_build_output_dir": "./dist",
+  "observability": {
+    "enabled": true
+  },
+  "compatibility_flags": [
+    "nodejs_compat"
+  ]
+}
