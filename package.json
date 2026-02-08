@@ -17,5 +17,8 @@
   "keywords": [],
   "author": "Vladyslav Lutchyn <vladyslav.lutchyn@gmail.com>",
   "license": "ISC",
-  "packageManager": "pnpm@10.28.2"
+  "packageManager": "pnpm@10.28.2",
+  "devDependencies": {
+    "wrangler": "^4.63.0"
+  }
 }

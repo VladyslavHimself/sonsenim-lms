@@ -1,26 +1,32 @@
 import Elysia from "elysia";
-import {LocalUserDAO} from "../models/dao/LocalUser.dao";
+import {createLocalUserDAO} from "../models/dao/LocalUser.dao";
 import createAuthService from "../services/auth.service";
 import createEncryptionService from "../services/encryption.service";
-import {AuthError} from "../exceptions/AuthException";
-import {LoginUserBodySchema, RegistrationUserBodySchema} from '@sonsenim/contracts';
-
-const EncryptionService = createEncryptionService({
-    timeCost: 3,
-    memoryCost: 64 * 1024,
-    parallelism: 1
-});
-
-const AuthService = createAuthService({
-    userDAO: LocalUserDAO,
-    encryptionService: EncryptionService
-});
+import {
+    LoginUserBody,
+    LoginUserBodySchema,
+    RegistrationUserBody,
+    RegistrationUserBodySchema
+} from '@sonsenim/contracts';
+import unwrapBody from "../helpers/unwrapBody";
 
 export const authRoutes = new Elysia({
     prefix: "/auth"
 })
-    .post('/register', async ({body}) => {
-        return AuthService.registerUser(body);
+    .derive(({db}) => {
+        return {
+            authService: createAuthService({
+                userDAO: createLocalUserDAO(db),
+                encryptionService: createEncryptionService({
+                    iterations: 100,
+                    saltLength: 16,
+                })
+            })
+        };
+    })
+    .post('/register', async ({body, authService}) => {
+        const unwrappedBody= await unwrapBody<RegistrationUserBody>(body)
+        return authService.registerUser(unwrappedBody);
     }, {
         body: RegistrationUserBodySchema,
         transform({body}) {
@@ -30,9 +36,9 @@ export const authRoutes = new Elysia({
     })
 
     // @ts-ignore #TODO: Add jwt accessor type
-    .post('/login', async ({body, jwt, cookie: {auth}}) => {
-        const {token} = await AuthService.loginUser(body, jwt);
-        const MIN_15 = 60 * 15;
+    .post('/login', async ({body, jwt, cookie: {auth}, authService}) => {
+        const unwrappedBody= await unwrapBody<LoginUserBody>(body)
+        const {token} = await authService.loginUser(unwrappedBody, jwt);
 
 
         auth!.set({
@@ -41,7 +47,6 @@ export const authRoutes = new Elysia({
             secure: true,
             sameSite: 'strict',
             path: '/',
-            // TODO: For dev purposes only
             maxAge: 60 ** 3 * 15
         })
 
@@ -59,10 +64,4 @@ export const authRoutes = new Elysia({
             path: '/',
             maxAge: 0
         })
-    })
-
-    // @ts-ignore
-    .error(({error}) => {
-        if (error instanceof AuthError) return new Response(error.message, {status: error.status});
-        return new Response('Internal Server Error', {status: 500});
     })

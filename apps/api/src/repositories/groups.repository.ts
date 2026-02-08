@@ -1,8 +1,7 @@
-import {GroupsDAO} from "../models/dao/Groups.dao";
 import {GroupsError} from "../exceptions/GroupsException";
 import {GroupPersistence} from "../models/persistence/Group.persistence";
-import {dbIns} from "../plugins/db";
 import {GroupConfigurationBody} from "@sonsenim/contracts";
+import {createGroupsDAO} from "../models/dao/Groups.dao";
 
 type GroupWithDecksCount = {
     groupid: string,
@@ -11,9 +10,10 @@ type GroupWithDecksCount = {
 }
 
 export default function createGroupsRepository(deps: {
-    groupsDAO: typeof GroupsDAO,
+    groupsDAO: ReturnType<typeof createGroupsDAO>,
+    db: any
 }) {
-    const {groupsDAO} = deps;
+    const {groupsDAO, db} = deps;
 
     async function getUserGroups(id: string) {
         return groupsDAO.findByUserId(id);
@@ -37,7 +37,7 @@ export default function createGroupsRepository(deps: {
     }
 
     async function getUserGroupsWithDecksCount(id: string): Promise<GroupWithDecksCount[]> {
-        const rows = await dbIns`
+        const rows = await db`
             SELECT g.id        as groupId,
                    g.name      as groupName,
                    COUNT(d.id) AS decksCount

@@ -1,15 +1,15 @@
-import {dbIns} from "../../plugins/db";
 import {Group} from "../domain/Group.model";
 
-export const GroupsDAO = {
+
+export const createGroupsDAO = (db: any) => ({
     findByUserId: async (userId: string) => {
-        return dbIns`SELECT *
+        return db`SELECT *
                      FROM groups
                      WHERE local_user_id = ${userId}`;
     },
 
     findByNameAndUserId: async (groupName: string, userId: string) => {
-        const rows = await dbIns`SELECT *
+        const rows = await db`SELECT *
                                  FROM groups
                                  WHERE name = ${groupName}
                                    AND local_user_id = ${userId}`;
@@ -17,7 +17,7 @@ export const GroupsDAO = {
     },
 
     findByIdAndUserId: async (groupId: string, userId: string) => {
-        const rows = await dbIns`SELECT *
+        const rows = await db`SELECT *
                                  FROM groups
                                  WHERE id = ${groupId}
                                    AND local_user_id = ${userId}`;
@@ -26,20 +26,20 @@ export const GroupsDAO = {
     },
 
     save: async (groupName: string, userId: string) => {
-        return dbIns`INSERT INTO groups (name, local_user_id)
+        return db`INSERT INTO groups (name, local_user_id)
                      VALUES (${groupName}, ${userId})`;
     },
 
     delete: async (groupId: string, userId: string) => {
-        return dbIns`DELETE
+        return db`DELETE
                      FROM groups
                      WHERE local_user_id = ${userId}
                        AND id = ${groupId}`;
     },
 
     update: async (id: string, group: Partial<Group>) => {
-        return dbIns`UPDATE groups
+        return db`UPDATE groups
                      SET name = ${group.groupName}
                      WHERE id = ${id}`;
     }
-}
+});

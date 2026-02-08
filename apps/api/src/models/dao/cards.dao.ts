@@ -1,16 +1,15 @@
-import {dbIns} from "../../plugins/db";
 import {Card} from "../domain/Card.model";
 import filterRawSqlData from "../../helpers/filterRawSqlData";
 
-export const CardsDAO = {
+export const createCardsDAO = (db: any) => ({
     findByDeckId: async (deckId: string) => {
-        return dbIns`SELECT *
+        return db`SELECT *
                      FROM cards
                      WHERE deck_id = ${deckId}`;
     },
 
     countByGroupId: async (groupId: string) => {
-        const rows = await dbIns`
+        const rows = await db`
             SELECT COUNT(c.id) AS cardscount
             FROM cards c
                      JOIN decks d ON c.deck_id = d.id
@@ -20,37 +19,38 @@ export const CardsDAO = {
     },
 
     add: async (deckId: string, body: Partial<Card>) => {
-        // TODO: Move pre persist constants to separate file
+        // TODO: Move pre persist constants to separate file -> upd: generate trigger on db
         const prePersistIntervalStrengthValue = 0;
-        return dbIns`INSERT INTO cards (deck_id, primary_word, explanation, definition, interval_strength)
+        return db`INSERT INTO cards (deck_id, primary_word, explanation, definition, interval_strength)
                      VALUES (${deckId}, ${body.primaryWord}, ${body.explanation},
                              ${body.definition}, ${prePersistIntervalStrengthValue})`;
     },
 
     findById: async (cardId: string) => {
-        const rows = await dbIns`SELECT *
+        const rows = await db`SELECT *
                                  FROM cards
                                  WHERE id = ${cardId}`;
         return filterRawSqlData(rows)[0] ?? null;
     },
 
     delete: async (cardId: string) => {
-        return dbIns`DELETE
+        return db`DELETE
                      FROM cards
                      WHERE id = ${cardId}`;
     },
 
     update: async (cardId: string, body: Card) => {
-        const rows = await dbIns`UPDATE cards
+        const rows = await db`UPDATE cards
                                  SET primary_word         = ${body.primaryWord},
                                      explanation          = ${body.explanation},
                                      definition           = ${body.definition},
                                      next_repetition_time = ${body.nextRepetitionTime},
                                      interval_strength    = ${body.intervalStrength},
                                      deck_id              = ${body.deckId}
-                                 WHERE id = ${cardId} RETURNING *
+                                 WHERE id = ${cardId}
+                                 RETURNING *
         `;
 
         return rows["0"] ?? null;
     }
-}
+});

@@ -1,10 +1,22 @@
-import {SQL} from 'bun';
-import Elysia from "elysia";
+import type { Elysia } from "elysia";
+import postgres from "postgres";
 
-export const dbIns = new SQL(process.env.DATABASE_URL!);
+export const dbPlugin = (app: Elysia) => {
+  return app.derive(( env) => {
+    const e = process.env
+    const connectionString = e?.hb ||
+        e?.DATABASE_URL ||
+        process.env.HYPERDRIVE_CONNECTION_STRING ||
+        process.env.DATABASE_URL
 
-const dbPlugin = (app: Elysia) => {
-    return app.decorate('db', dbIns)
-}
+    if (!connectionString) {
+      throw new Error("Missing DATABASE_URL");
+    }
 
-export default dbPlugin;
+    const sql = postgres(connectionString, { prepare: false });
+
+    return {
+      db: sql
+    };
+  });
+};

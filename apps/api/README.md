@@ -13,3 +13,14 @@ Follow these steps to run [Elysia.js](https://elysiajs.com) under [Bun](https://
    bun run main.ts
    ```
 
+# Cloudflare Workers
+
+1. Ensure `DATABASE_URL` is set (or bind Hyperdrive in `wrangler.jsonc`)
+2. Run locally:
+   ```bash
+   pnpm w:dev
+   ```
+3. Deploy:
+   ```bash
+   pnpm deploy
+   ```

@@ -1,10 +1,10 @@
-import {LocalUserDAO} from "../models/dao/LocalUser.dao";
+import {createLocalUserDAO} from "../models/dao/LocalUser.dao";
 import createEncryptionService from "./encryption.service";
 import {AuthError} from "../exceptions/AuthException";
 import type {LoginUserBody, RegistrationUserBody} from "@sonsenim/contracts";
 
 export default function createAuthService(deps: {
-    userDAO: typeof LocalUserDAO,
+    userDAO: ReturnType<typeof createLocalUserDAO>,
     encryptionService: ReturnType<typeof createEncryptionService>
 }) {
     const {userDAO, encryptionService} = deps;
@@ -22,7 +22,7 @@ export default function createAuthService(deps: {
         const {username, password} = body;
         const user = await userDAO.findByUsername(username);
         if (!user.length) throw new AuthError("User not found", 404);
-        const isPasswordValid = await encryptionService.verifyPassword(user[0].password, password);
+        const isPasswordValid = await encryptionService.verifyPassword(password, user[0].password)
         if (!isPasswordValid) throw new AuthError("Invalid password", 401);
 
         const token = await jwt.sign({
