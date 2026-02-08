@@ -5,7 +5,7 @@
     "start": "bun run main.ts",
     "pg-migrate": "node-pg-migrate",
     "typecheck": "tsc",
-    "deploy": "wrangler deploy --minify",
+    "w:deploy": "wrangler deploy --minify",
     "w:dev": "wrangler dev",
     "w:preview": "wrangler pages dev .dist"
   },
