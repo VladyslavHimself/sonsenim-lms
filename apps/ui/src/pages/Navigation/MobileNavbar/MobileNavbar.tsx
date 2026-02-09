@@ -29,7 +29,7 @@ const mobileNavbarTabs = [
         href: "#",
         isShown: (currentPath: string) => /^\/groups\/?$/.test(currentPath),
         action: () => {
-            Modal.open(() => <CreateNewGroupModal/>, 'Create a new group')
+            Modal.open((modal) => <CreateNewGroupModal modal={modal} />, 'Create a new group')
         }
     },
 
