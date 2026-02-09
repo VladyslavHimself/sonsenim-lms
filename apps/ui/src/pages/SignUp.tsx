@@ -89,7 +89,7 @@ export default function SignUp() {
 
                         <div className="auth-container-body">
                             <Button className="auth-container-submit-button" size="lg"
-                                    style={{fontFamily: 'Gilroy Bold', fontSize: 18, borderRadius: 12, width: 400}}>
+                                    style={{fontFamily: 'Gilroy Bold, sans-serif', fontWeight: 'bold', fontSize: 18, borderRadius: 12, width: 400}}>
                                 Create an account
                             </Button>
                             <div className="auth-container-footer">

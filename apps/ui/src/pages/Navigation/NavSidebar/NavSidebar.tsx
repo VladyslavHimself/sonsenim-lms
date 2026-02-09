@@ -1,5 +1,5 @@
 import './NavSidebar.scss';
-import Logotype from '@/assets/logo.png';
+import Logotype from '@/assets/logo.svg';
 import NavSidebarList from "@/pages/Navigation/NavSidebar/NavSidebarList/NavSidebarList.tsx";
 import { useState } from "react";
 

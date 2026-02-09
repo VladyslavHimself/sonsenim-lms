@@ -1,7 +1,6 @@
 import '../styles/auth.styles.scss';
-import Logotype from '../assets/logo.png';
+import Logotype from '../assets/logo.svg';
 import {Input} from "@/components/ui/input.tsx";
-import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {Link, NavLink, useNavigate} from "react-router-dom";
 import {Button} from "@/components/ui/button.tsx";
 import {z} from "zod";
@@ -49,7 +48,7 @@ export default function SignIn() {
         <div className="auth-wrapper">
             <div className="auth-container">
                 <div className="auth-container-header">
-                    <img src={Logotype} alt="logo" />
+                    <img src={Logotype} alt="logo" style={{width: '200px', height: '200px', backgroundSize: 'cover'}} />
                     <h1>Sign In</h1>
                 </div>
 
@@ -76,20 +75,11 @@ export default function SignIn() {
 
                         <div className="auth-container-body">
                             <div className="auth-container-options-field" style={{marginTop: 27}}>
-                                <div className="auth-container-options-checkbox">
-                                    <Checkbox id="rememberPassword"/>
-                                    <label
-                                        htmlFor="rememberPassword"
-                                        className="text-lg ml-1.5 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                    >
-                                        Remember me
-                                    </label>
-                                </div>
-
+                                <div></div>
                                 <NavLink to="#">Forgot password?</NavLink>
                             </div>
                             <Button className="auth-container-submit-button" size="lg"
-                                    style={{fontFamily: 'Gilroy Bold', fontSize: 18, borderRadius: 12, width: 300}}>
+                                    style={{fontFamily: 'Gilroy Bold, sans-serif', fontSize: 18, fontWeight: 'bold', borderRadius: 12, width: 300}}>
                                 Sign in
                             </Button>
                         </div>
