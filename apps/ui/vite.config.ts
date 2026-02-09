@@ -28,7 +28,7 @@ export default defineConfig({
                 display: 'standalone',
                 orientation: 'portrait',
                 short_name: 'Sonsenim',
-                theme_color: '#ffffff',
+                theme_color: '#f4f4f4',
                 start_url: '/',
                 icons: [
                     {
