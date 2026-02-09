@@ -52,12 +52,12 @@ export default function createCardsRepository(deps: {
     }
 
     async function getDueCardsFromDeck(deckId: string) {
-        await decksRepository.findDeck(deckId);
+        const existingDeck = await decksRepository.findDeck(deckId);
 
         const cards = await db`SELECT c.*
                                   FROM cards c
-                                  WHERE c.deck_id = ${deckId} AND c.next_repetition_time IS NULL
-                                     OR c.next_repetition_time < ${new Date()}`;
+                                  WHERE c.deck_id = ${existingDeck.id} AND (c.next_repetition_time IS NULL
+                                     OR c.next_repetition_time < ${new Date()})`;
 
         return cardMapper.toDTOList(cards);
     }
