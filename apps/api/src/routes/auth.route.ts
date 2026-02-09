@@ -31,7 +31,6 @@ export const authRoutes = new Elysia({
         body: RegistrationUserBodySchema,
         transform({body}) {
             body.email &&= body.email.toLowerCase();
-            body.username &&= body.username.toLowerCase();
         }
     })
 

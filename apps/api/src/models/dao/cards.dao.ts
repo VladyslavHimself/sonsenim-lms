@@ -20,10 +20,11 @@ export const createCardsDAO = (db: any) => ({
 
     add: async (deckId: string, body: Partial<Card>) => {
         // TODO: Move pre persist constants to separate file -> upd: generate trigger on db
+        const {primaryWord, definition, explanation} = body;
         const prePersistIntervalStrengthValue = 0;
         return db`INSERT INTO cards (deck_id, primary_word, explanation, definition, interval_strength)
-                     VALUES (${deckId}, ${body.primaryWord}, ${body.explanation},
-                             ${body.definition}, ${prePersistIntervalStrengthValue})`;
+                     VALUES (${deckId}, ${primaryWord}, ${explanation || ""},
+                             ${definition}, ${prePersistIntervalStrengthValue})`;
     },
 
     findById: async (cardId: string) => {
