@@ -1,7 +1,7 @@
 import {z} from "zod";
 
 export const RegistrationUserBodySchema = z.object({
-    username: z.string().min(5, "Username must be at least 5 characters long"),
+    username: z.string().min(4, "Username must be at least 5 characters long"),
     firstName: z.string().min(2, "First name must be at least 2 characters long"),
     lastName: z.string().min(2, "Last name must be at least 2 characters long"),
     email: z.string().email("Email address must be a valid email address"),

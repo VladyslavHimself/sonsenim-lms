@@ -43,7 +43,7 @@ export default function SignUp() {
                             <FormItem className="auth-container-form-item">
                                 <FormLabel className="auth-container-input-label">Username</FormLabel>
                                 <FormControl>
-                                    <Input className="auth-container-input" {...field} />
+                                    <Input className="auth-container-input" {...field} autoCapitalize="none" />
                                 </FormControl>
                             </FormItem>
                         )}/>
@@ -72,7 +72,7 @@ export default function SignUp() {
                             <FormItem className="auth-container-form-item">
                                 <FormLabel className="auth-container-input-label">Email</FormLabel>
                                 <FormControl>
-                                    <Input className="auth-container-input" {...field} />
+                                    <Input className="auth-container-input" {...field} type="email" autoCapitalize="none" />
                                 </FormControl>
                             </FormItem>
                         )}/>
@@ -81,7 +81,7 @@ export default function SignUp() {
                             <FormItem className="auth-container-form-item">
                                 <FormLabel className="auth-container-input-label">Password</FormLabel>
                                 <FormControl>
-                                    <Input type="password" className="auth-container-input" {...field} />
+                                    <Input type="password" className="auth-container-input" {...field} autoCapitalize="none" />
                                 </FormControl>
                             </FormItem>
                         )}

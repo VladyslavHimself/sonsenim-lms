@@ -2,6 +2,7 @@ import {createLocalUserDAO} from "../models/dao/LocalUser.dao";
 import createEncryptionService from "./encryption.service";
 import {AuthError} from "../exceptions/AuthException";
 import type {LoginUserBody, RegistrationUserBody} from "@sonsenim/contracts";
+import unwrapBody from "../helpers/unwrapBody";
 
 export default function createAuthService(deps: {
     userDAO: ReturnType<typeof createLocalUserDAO>,

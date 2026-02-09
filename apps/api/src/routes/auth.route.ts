@@ -29,9 +29,6 @@ export const authRoutes = new Elysia({
         return authService.registerUser(unwrappedBody);
     }, {
         body: RegistrationUserBodySchema,
-        transform({body}) {
-            body.email &&= body.email.toLowerCase();
-        }
     })
 
     // @ts-ignore #TODO: Add jwt accessor type
