@@ -4,14 +4,18 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build:without-tsc": "vite build",
-    "build": "tsc -b && vite build",
-    "w:preview": "vite build && wrangler pages dev",
-    "w:deploy": "vite build && wrangler pages deploy",
+    "dev:staging": "vite --host --env staging",
+    "n:build": "tsc -b && vite build",
+
+    "w:prev": "vite build && wrangler pages dev",
+    "n:preview": "vite preview --host",
+
+    "cf:prod:deploy": "vite build && wrangler pages deploy --env production",
+    "cf:stage:deploy": "vite build && wrangler pages deploy --env staging",
+
+    "coverage": "vitest --coverage",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview --host",
-    "generate-pwa-assets": "pwa-assets-generator --preset minimal public/vite.svg",
-    "coverage": "vitest --coverage"
+    "generate-pwa-assets": "pwa-assets-generator --preset minimal public/vite.svg"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

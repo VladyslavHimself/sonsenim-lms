@@ -2,12 +2,14 @@
   "name": "api",
   "type": "module",
   "scripts": {
-    "start": "bun run main.ts",
+    "n:dev": "bun run main.ts",
+    "dev": "wrangler dev --env development",
+
+    "cf:prod:deploy": "wrangler deploy --minify --env production",
+    "cf:stage:deploy": "wrangler deploy --minify --env staging",
+
     "pg-migrate": "node-pg-migrate",
-    "typecheck": "tsc",
-    "w:deploy": "wrangler deploy --minify",
-    "w:dev": "wrangler dev",
-    "w:preview": "wrangler pages dev .dist"
+    "typecheck": "tsc"
   },
   "devDependencies": {
     "@types/bun": "1",

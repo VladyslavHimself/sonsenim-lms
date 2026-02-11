@@ -1,22 +1,21 @@
-import type { Elysia } from "elysia";
+import type {Elysia} from "elysia";
 import postgres from "postgres";
 
 export const dbPlugin = (app: Elysia) => {
-  return app.derive(( env) => {
-    const e = process.env
-    const connectionString = e?.hb ||
-        e?.DATABASE_URL ||
-        process.env.HYPERDRIVE_CONNECTION_STRING ||
-        process.env.DATABASE_URL
+    return app.derive((env) => {
+        const e = process.env
 
-    if (!connectionString) {
-      throw new Error("Missing DATABASE_URL");
-    }
+        const connectionString = e?.hb ||
+            process.env.DATABASE_URL
 
-    const sql = postgres(connectionString, { prepare: false });
+      if (!connectionString) {
+            throw new Error("Missing DATABASE_URL");
+        }
 
-    return {
-      db: sql
-    };
-  });
+        const sql = postgres(connectionString, {prepare: false});
+
+        return {
+            db: sql
+        };
+    });
 };
