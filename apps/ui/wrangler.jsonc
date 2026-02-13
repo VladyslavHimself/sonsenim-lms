@@ -1,6 +1,5 @@
 {
-  "name": "staging-sonsenim-ui",
-  "compatibility_date": "2026-02-05",
+  "name": "staging-sonsenim-lms-ui",
   "pages_build_output_dir": "./dist",
   "observability": {
     "enabled": true
