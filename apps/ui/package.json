@@ -5,13 +5,12 @@
   "scripts": {
     "dev": "vite --host",
     "dev:staging": "vite --host --env staging",
-    "n:build": "tsc -b && vite build",
+    "n:build": "vite build",
 
     "w:prev": "vite build && wrangler pages dev",
     "n:preview": "vite preview --host",
 
-    "cf:prod:deploy": "vite build && wrangler pages deploy --branch main",
-    "cf:stage:deploy": "vite build && wrangler pages deploy --branch staging",
+    "cf:stage:deploy": "wrangler pages deploy --branch main",
 
     "coverage": "vitest --coverage",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
