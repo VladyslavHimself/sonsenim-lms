@@ -29,7 +29,7 @@ const mobileNavbarTabs = [
         href: "#",
         isShown: (currentPath: string) => /^\/groups\/?$/.test(currentPath),
         action: () => {
-            Modal.open(() => <CreateNewGroupModal/>, 'Create a new group')
+            Modal.open((modal) => <CreateNewGroupModal modal={modal} />, 'Create a new group')
         }
     },
 
@@ -41,7 +41,7 @@ const mobileNavbarTabs = [
         isShown: (currentPath: string) => /^\/groups\/\d+/.test(currentPath),
         action: (pathname: string) => {
             Modal.open((modal) => <CreateNewDeckModal modal={modal}
-                                                      groupId={+extractIdFromGroupsPath(pathname)!}/>, 'Create a new deck', 'create-new-deck-modal')
+                                                      groupId={extractIdFromGroupsPath(pathname)!}/>, 'Create a new deck', 'create-new-deck-modal')
         }
     },
 
@@ -72,7 +72,7 @@ export default function MobileNavbar() {
 };
 
 const extractIdFromGroupsPath = (pathname: string) => {
-    const regex = /^\/groups\/(\d+)/;
+    const regex = /^\/groups\/([^/]+)/; // regex pattern to match UUID
     const match = pathname.match(regex);
     return match ? match[1] : null;
 };

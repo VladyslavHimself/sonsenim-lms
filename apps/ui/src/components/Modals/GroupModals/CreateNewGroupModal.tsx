@@ -7,7 +7,7 @@ import {groupFieldsSchema} from "@/components/Modals/GroupModals/groupFields.sch
 import ModalFormFieldInput from "@/components/Modals/ui/ModalFormFieldInput/ModalFormFieldInput.tsx";
 import useUserGroupsInfo from "@/api/groups/useUserGroupsInfo.ts";
 import {ModalBoxBody, ModalBoxConfirmationFooter} from "@/ModalBox/ModalBoxTemplates.tsx";
-import {ModalInstance} from "@/ModalBox/modalBox.ts";
+import {Modal, ModalInstance} from "@/ModalBox/modalBox.ts";
 
 type Props = {
     modal: ModalInstance
@@ -16,7 +16,7 @@ type Props = {
 export default function CreateNewGroupModal({ modal }: Props) {
     const { refetch } = useUserGroupsInfo();
     const { createUserGroup } = useCreateUserGroupMutation(() => {
-        modal.close(modal.id)
+        Modal.close(modal.id)
         refetch();
     });
     const form = useForm<z.infer<typeof groupFieldsSchema>>({

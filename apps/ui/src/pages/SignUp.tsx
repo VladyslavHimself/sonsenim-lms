@@ -43,7 +43,7 @@ export default function SignUp() {
                             <FormItem className="auth-container-form-item">
                                 <FormLabel className="auth-container-input-label">Username</FormLabel>
                                 <FormControl>
-                                    <Input className="auth-container-input" {...field} />
+                                    <Input className="auth-container-input" {...field} autoCapitalize="none" />
                                 </FormControl>
                             </FormItem>
                         )}/>
@@ -72,7 +72,7 @@ export default function SignUp() {
                             <FormItem className="auth-container-form-item">
                                 <FormLabel className="auth-container-input-label">Email</FormLabel>
                                 <FormControl>
-                                    <Input className="auth-container-input" {...field} />
+                                    <Input className="auth-container-input" {...field} type="email" autoCapitalize="none" />
                                 </FormControl>
                             </FormItem>
                         )}/>
@@ -81,7 +81,7 @@ export default function SignUp() {
                             <FormItem className="auth-container-form-item">
                                 <FormLabel className="auth-container-input-label">Password</FormLabel>
                                 <FormControl>
-                                    <Input type="password" className="auth-container-input" {...field} />
+                                    <Input type="password" className="auth-container-input" {...field} autoCapitalize="none" />
                                 </FormControl>
                             </FormItem>
                         )}
@@ -89,7 +89,7 @@ export default function SignUp() {
 
                         <div className="auth-container-body">
                             <Button className="auth-container-submit-button" size="lg"
-                                    style={{fontFamily: 'Gilroy Bold', fontSize: 18, borderRadius: 12, width: 400}}>
+                                    style={{fontFamily: 'Gilroy Bold, sans-serif', fontWeight: 'bold', fontSize: 18, borderRadius: 12, width: 400}}>
                                 Create an account
                             </Button>
                             <div className="auth-container-footer">

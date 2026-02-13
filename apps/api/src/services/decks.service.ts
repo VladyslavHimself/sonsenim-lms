@@ -16,7 +16,6 @@ export const createDecksService = function (deps: {
     async function addDeckToGroup(user: any, groupId: string, deckConfiguration: DeckConfigurationBody) {
         const group = await groupsRepository.getByIdAndUserId(groupId, user.id);
         if (!group) throw new DecksException('Group not found', 404);
-        console.log(deckConfiguration);
         return decksRepository.addDeckToGroup(groupId, deckConfiguration);
     }
 

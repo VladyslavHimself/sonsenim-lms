@@ -1,17 +1,19 @@
-import axios from 'axios';
 import {LoginUserBody, RegistrationUserBody} from '@sonsenim/contracts';
+import {RESOURCE_SERVER_URL} from "@/constants/resource.ts";
+import {axiosInstance} from "@/api/axiosInstance.ts";
 
 export const AuthApi = {
 
     loginUser(loginBody: LoginUserBody) {
-        return axios.post(`/api/auth/login`, loginBody);
+        console.log(process.env)
+        return axiosInstance.post(`${RESOURCE_SERVER_URL}/api/auth/login`, loginBody);
     },
 
     registerUser(credentials: RegistrationUserBody) {
-        return axios.post('/api/auth/register', credentials)
+        return axiosInstance.post(`${RESOURCE_SERVER_URL}/api/auth/register`, credentials)
     },
 
     logoutUser() {
-        return axios.get('/api/auth/logout');
+        return axiosInstance.get(`${RESOURCE_SERVER_URL}/api/auth/logout`);
     }
 }
