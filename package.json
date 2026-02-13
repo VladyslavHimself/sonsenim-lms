@@ -6,14 +6,21 @@
   "scripts": {
     "ui:dev": "pnpm --filter ui dev",
     "ui:coverage": "pnpm --filter ui coverage",
+    "ui:prod:deploy": "pnpm --filter ui cf:prod:deploy",
+
     "api:dev": "pnpm --filter api start",
+
     "db:migrate": "dbmate migrate",
     "db:status": "dbmate status",
-    "w:api:deploy": "pnpm --filter api w:deploy",
+
+    "api:prod:deploy": "pnpm --filter api cf:prod:deploy",
+    "api:staging:deploy": "pnpm --filter api cf:stage:deploy",
     "w:api:dev": "pnpm --filter api w:dev",
+
     "dev": "pnpm run start:ui & pnpm run start:api",
     "build": "pnpm recursive run build",
     "test": "pnpm recursive run test",
+
     "app:dev": "pnpm -r --parallel --stream --filter ui --filter api run dev",
     "app:staging": "pnpm -r --parallel --stream --filter ui --filter api run staging"
   },

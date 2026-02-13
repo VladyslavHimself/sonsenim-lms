@@ -10,8 +10,8 @@
     "w:prev": "vite build && wrangler pages dev",
     "n:preview": "vite preview --host",
 
-    "cf:prod:deploy": "vite build && wrangler pages deploy --env production",
-    "cf:stage:deploy": "vite build && wrangler pages deploy --env staging",
+    "cf:prod:deploy": "vite build && wrangler pages deploy --branch main",
+    "cf:stage:deploy": "vite build && wrangler pages deploy --branch staging",
 
     "coverage": "vitest --coverage",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
