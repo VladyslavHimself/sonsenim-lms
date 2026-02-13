@@ -6,7 +6,8 @@
   "scripts": {
     "ui:dev": "pnpm --filter ui dev",
     "ui:coverage": "pnpm --filter ui coverage",
-    "ui:prod:deploy": "pnpm --filter ui cf:prod:deploy",
+    "ui:stage:deploy": "pnpm --filter ui cf:stage:deploy",
+    "ui:build": "pnpm --filter ui n:build",
 
     "api:dev": "pnpm --filter api start",
 
