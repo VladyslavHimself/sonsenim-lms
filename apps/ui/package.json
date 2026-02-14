@@ -10,7 +10,7 @@
     "w:prev": "vite build && wrangler pages dev",
     "n:preview": "vite preview --host",
 
-    "cf:stage:deploy": "wrangler pages deploy ./dist --project-name staging-sonsenim-lms-ui",
+    "cf:stage:deploy": "wrangler pages deploy ./dist --branch main",
 
 
     "coverage": "vitest --coverage",
