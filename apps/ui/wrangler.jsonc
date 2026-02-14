@@ -1,5 +1,5 @@
 {
-  "name": "staging-sonsenim-lms-ui",
+  "name": "sonsenim-lms-ui",
   "pages_build_output_dir": "./dist",
   "observability": {
     "enabled": true
