@@ -8,7 +8,7 @@ vars = { }
 name = "sonsenim-api-staging"
 vars = { APP_ENV = "staging" }
 
-[env.staging.hyperdrive]
+[[env.staging.hyperdrive]]
 binding = "HYPERDRIVE"
 id = "35c32e963c7a43fc807e4fabad65947b"
 
@@ -20,7 +20,7 @@ zone_name = "sonsennim.com"
 name = "sonsenim-api"
 vars = { APP_ENV = "production" }
 
-[env.production.hyperdrive]
+[[env.production.hyperdrive]]
 binding = "HYPERDRIVE"
 id = "7db77ce347b5473a87a95ec176c61274"
 
