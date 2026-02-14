@@ -11,7 +11,7 @@
     "n:preview": "vite preview --host",
 
     "cf:stage:deploy": "wrangler pages deploy ./dist --project-name staging-sonsenim-lms-ui --branch main",
-    "cf:release:deploy": "wrangler pages deploy ./dist --project-name staging-sonsenim-lms-ui --branch production",
+    "cf:release:deploy": "wrangler pages deploy ./dist --project-name sonsenim-lms-ui --branch production",
 
     "coverage": "vitest --coverage",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
