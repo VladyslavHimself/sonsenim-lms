@@ -17,7 +17,12 @@
           "id": "35c32e963c7a43fc807e4fabad65947b"
         }
       ],
-      "route": "staging.api.sonsenim.com/*"
+      "routes": [
+        {
+          "pattern": "staging.api.sonsennim.com/*",
+          "zone_name": "sonsenim.com"
+        }
+      ]
     },
 
     "production": {
@@ -31,7 +36,9 @@
           "id": "7db77ce347b5473a87a95ec176c61274"
         }
       ],
-      "route": "api.sonsenim.com/*"
+      "routes": [
+        { "pattern": "api.sonsennim.com/*", "zone_name": "sonsenim.com" }
+      ]
     }
   }
 }
