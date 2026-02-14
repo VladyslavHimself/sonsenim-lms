@@ -19,7 +19,7 @@
     "w:api:dev": "pnpm --filter api w:dev",
     "dev": "pnpm run start:ui & pnpm run start:api",
     "build": "pnpm recursive run build",
-    "test": "pnpm recursive run test 3",
+    "test": "pnpm recursive run test 4",
 
     "app:dev": "pnpm -r --parallel --stream --filter ui --filter api run dev",
     "app:staging": "pnpm -r --parallel --stream --filter ui --filter api run staging"
