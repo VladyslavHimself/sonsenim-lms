@@ -10,7 +10,8 @@
     "w:prev": "vite build && wrangler pages dev",
     "n:preview": "vite preview --host",
 
-    "cf:stage:deploy": "wrangler pages deploy",
+    "cf:stage:deploy": "wrangler pages deploy ./dist --project-name staging-sonsenim-lms-ui",
+
 
     "coverage": "vitest --coverage",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
