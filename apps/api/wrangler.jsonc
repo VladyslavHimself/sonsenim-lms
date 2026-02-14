@@ -20,7 +20,7 @@
       "routes": [
         {
           "pattern": "staging.api.sonsennim.com/*",
-          "zone_name": "sonsenim.com"
+          "zone_name": "sonsennim.com"
         }
       ]
     },
@@ -37,7 +37,7 @@
         }
       ],
       "routes": [
-        { "pattern": "api.sonsennim.com/*", "zone_name": "sonsenim.com" }
+        { "pattern": "api.sonsennim.com/*", "zone_name": "sonsennim.com" }
       ]
     }
   }
