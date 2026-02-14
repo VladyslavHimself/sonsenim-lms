@@ -7,7 +7,7 @@
 
   "env": {
     "staging": {
-      "name": "sonsenim-api",
+      "name": "sonsenim-api-staging",
       "vars": {
         "APP_ENV": "staging"
       },
