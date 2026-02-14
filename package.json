@@ -17,7 +17,7 @@
     "api:prod:deploy": "pnpm --filter api cf:prod:deploy",
     "api:staging:deploy": "pnpm --filter api cf:stage:deploy",
     "w:api:dev": "pnpm --filter api w:dev",
-
+    "testScript": "echo 'test script'",
     "dev": "pnpm run start:ui & pnpm run start:api",
     "build": "pnpm recursive run build",
     "test": "pnpm recursive run test",
