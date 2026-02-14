@@ -13,7 +13,7 @@ binding = "HYPERDRIVE"
 id = "35c32e963c7a43fc807e4fabad65947b"
 
 [[env.staging.routes]]
-pattern = "staging.api.sonsennim.com/*"
+pattern = "staging-api.sonsennim.com/*"
 zone_name = "sonsennim.com"
 
 [env.production]
