@@ -27,3 +27,11 @@ id = "7db77ce347b5473a87a95ec176c61274"
 [[env.production.routes]]
 pattern = "api.sonsennim.com/*"
 zone_name = "sonsennim.com"
+
+[env.development]
+name = "sonsenim-api-development"
+vars = { APP_ENV = "development" }
+
+[[env.development.hyperdrive]]
+binding = "HYPERDRIVE"
+id = ""
