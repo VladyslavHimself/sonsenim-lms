@@ -1,5 +1,4 @@
 import './Card.scss';
-import GroupImageExample from "@/assets/Icons/Groups/group-image-example.png";
 
 import {Pencil} from "lucide-react";
 import {MouseEventHandler, ReactNode, useState} from "react";
@@ -21,7 +20,7 @@ export default function Card({
                                  secondaryTile,
                                  onClickHandler,
                                  onEditHandler,
-                                 imageSrc
+                                 // imageSrc
                              }: Props) {
     // TODO: Make it with ref
     const [isEditVisible, setIsEditVisible] = useState<boolean>(false);
@@ -43,18 +42,20 @@ export default function Card({
                     <div>{cardTitle}</div>
                     {onEditHandler && isEditVisible && <Pencil
                         data-testid="card-edit-pencil-icon"
-                        width={20}
-                        height={20}
+                        className="card-edit-pencil-icon"
+
                         onClick={(e) => onEditHandler(e)}/>
                     }
                 </div>
                 {secondaryTile}
             </div>
-            {imageSrc && (
-                <div className="group-card-image">
-                    <img src={GroupImageExample} alt=""/>
-                </div>
-            )}
+
+            {/*// TODO: Disabled for current version*/}
+            {/*{imageSrc && (*/}
+            {/*    <div className="group-card-image">*/}
+            {/*        <img src={GroupImageExample} alt=""/>*/}
+            {/*    </div>*/}
+            {/*)}*/}
         </div>
     );
 };

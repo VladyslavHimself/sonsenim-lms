@@ -68,12 +68,27 @@
     justify-content: space-between;
 
 
-
     .group-card-info-title {
       display: flex;
       align-items: center;
 
-      > div { padding-right: 15px; }
+      max-width: 75%;
+
+      > div {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        padding-right: 15px;
+      }
+
+    }
+
+    .card-edit-pencil-icon {
+      width: 20px;
+      height: 20px;
+
+      min-width: 20px;
+      min-height: 20px;
     }
 
     div:nth-child(1) {

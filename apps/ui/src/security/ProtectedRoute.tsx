@@ -5,8 +5,7 @@ import {Navigate} from "react-router-dom";
 export default function ProtectedRoute({children}: PropsWithChildren) {
     const {userInfo, isLoading} = useAuth();
 
-    if (isLoading) return <>Loading...</>;
-    if (!userInfo?.id) return <Navigate to={'/signIn'} replace />
+    if (!isLoading && !userInfo?.id) return <Navigate to={'/signIn'} replace />
 
     return children;
 }

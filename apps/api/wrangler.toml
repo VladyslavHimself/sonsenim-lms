@@ -1,6 +1,6 @@
 name = "sonsenim-api"
 main = "./worker.ts"
-compatibility_date = "2026-02-05"
+compatibility_date = "2026-02-16"
 compatibility_flags = ["nodejs_compat", "nodejs_compat_populate_process_env"]
 vars = { }
 
@@ -12,18 +12,30 @@ vars = { APP_ENV = "staging" }
 binding = "HYPERDRIVE"
 id = "35c32e963c7a43fc807e4fabad65947b"
 
-[[env.staging.routes]]
-pattern = "staging-api.sonsennim.com/*"
-zone_name = "sonsennim.com"
+#[[env.staging.routes]]
+#pattern = "staging-api.sonsennim.com/*"
+#zone_name = "sonsennim.com"
 
 [env.production]
-name = "sonsenim-api"
+name = "sonsenim-api-production"
 vars = { APP_ENV = "production" }
 
 [[env.production.hyperdrive]]
 binding = "HYPERDRIVE"
 id = "7db77ce347b5473a87a95ec176c61274"
 
-[[env.production.routes]]
-pattern = "api.sonsennim.com/*"
-zone_name = "sonsennim.com"
+#[[env.production.routes]]
+#pattern = "api.sonsennim.com/*"
+#zone_name = "sonsennim.com"
+
+[env.development]
+name = "sonsenim-api-development"
+vars = { APP_ENV = "development" }
+
+[[env.development.hyperdrive]]
+binding = "HYPERDRIVE"
+id = "35c32e963c7a43fc807e4fabad65947b"
+
+#[[env.development.routes]]
+#pattern = "dev-api.sonsennim.com/*"
+#zone_name = "sonsennim.com"

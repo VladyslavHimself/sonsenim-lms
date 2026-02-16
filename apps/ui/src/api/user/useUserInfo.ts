@@ -9,5 +9,7 @@ export default function useUserInfo() {
             .then(({data}) => data)
     });
 
+    console.log(isLoading);
+
     return { userInfo, refetch, isLoading }
 }

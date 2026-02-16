@@ -5,11 +5,12 @@ import {Context} from "elysia";
 export default {
   async fetch(
       request: Request,
-      env: Env,
+      env: Env & { HYPERDRIVE: { connectionString: string }},
       ctx: Context,
 
   ): Promise<Response> {
     process.env.hb = env.HYPERDRIVE.connectionString;
+
     return await app!.fetch(request)
   },
 }
