@@ -17,7 +17,7 @@ id = "35c32e963c7a43fc807e4fabad65947b"
 #zone_name = "sonsennim.com"
 
 [env.production]
-name = "sonsenim-api"
+name = "sonsenim-api-production"
 vars = { APP_ENV = "production" }
 
 [[env.production.hyperdrive]]
