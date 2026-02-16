@@ -18,9 +18,10 @@ type Props = {
 
 export default function DeckCardMenubar({modal, deckProperties, refetchDecks, groupId, navigate}: Props) {
     const { dueCardsInDeck } = deckProperties;
+
     return (
         <div className="deck-menubar-container">
-            <Button disabled={!dueCardsInDeck} variant="outline" className="menubar-list-item" onClick={openMemoizationPage}><Brain/> Start
+            <Button disabled={!+dueCardsInDeck} variant="outline" className="menubar-list-item" onClick={openMemoizationPage}><Brain/> Start
                 Learning</Button>
             <Button variant="outline" className="menubar-list-item" onClick={onAddNewCardHandle}><PlusIcon/> Add new
                 card</Button>

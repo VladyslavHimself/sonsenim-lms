@@ -51,11 +51,6 @@ export default function ModalBoxProvider({children}: Props) {
             {
                 createPortal(
                     <div className="modal-root">
-                        {!!modals.length && <div className="modal-backdrop" onClick={() => {
-                            const newModals = [...modals];
-                            newModals.pop();
-                            setModals(newModals);
-                        }}/>}
                         {/*TODO: Add classnames to modals*/}
                         {modals.map(m => {
                             const modalObj: ModalInstance = {
@@ -63,9 +58,9 @@ export default function ModalBoxProvider({children}: Props) {
                                 close: () => close(m.id)
                             };
 
-
                             return (
                                 <div className="modal-box" key={m.id}>
+                                    <div className="modal-backdrop" onClick={() => close(m.id)} />
                                     <div className={`modal-box-container ${m.modalClassname || ''}`}>
                                         {!isEmpty(m.title) && (
                                             <div className="modal-box-header">
