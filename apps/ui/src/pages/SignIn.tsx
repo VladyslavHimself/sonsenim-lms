@@ -23,11 +23,11 @@ const signInSchema = z.object({
 
 
 export default function SignIn() {
-    const { userInfo, setUserInfo } = useAuth();
+    const { userInfo } = useAuth();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const { loginUser } = useSignIn(() => {
-        queryClient.invalidateQueries({queryKey: ['user-info-me']}).then(r => setUserInfo(r));
+        queryClient.invalidateQueries({queryKey: ['user-info-me']}).then(r => r);
     });
     const form = useForm<z.infer<typeof signInSchema>>({
         resolver: zodResolver(signInSchema),

@@ -7,7 +7,6 @@ import {Link, useLocation, useNavigate} from "react-router-dom";
 import React, {useMemo} from "react";
 import useLogout from "@/api/auth/useLogout.ts";
 import {useQueryClient} from "@tanstack/react-query";
-import {useAuth} from "@/security/AuthProvider.tsx";
 
 const TOP_NAVLINKS = [
     {
@@ -48,11 +47,10 @@ export default function NavSidebarList(
     const queryClient = useQueryClient();
     const location = useLocation();
     const navigate = useNavigate();
-    const { setUserInfo } = useAuth();
     const { logoutUser } = useLogout(() => {
         localStorage.removeItem('selectedGroup');
         queryClient.removeQueries();
-        queryClient.invalidateQueries({queryKey: ['user-info-me']}).then(r => setUserInfo(r));
+        queryClient.invalidateQueries({queryKey: ['user-info-me']}).then(r => r);
 
         navigate('/signIn');
     });

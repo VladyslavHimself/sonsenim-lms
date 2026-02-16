@@ -1,4 +1,4 @@
-import React, {createContext, ReactNode, useContext, useEffect, useState} from "react";
+import {createContext, ReactNode, useContext} from "react";
 import useUserInfo from "@/api/user/useUserInfo.ts";
 import {UserInfoResponse} from "@/api/user/user.ts";
 
@@ -11,19 +11,16 @@ type Props = {
 
 type AuthContext = {
     userInfo: UserInfoResponse | null,
-    setUserInfo: React.Dispatch<React.SetStateAction<UserInfoResponse | null>>,
     isLoading: boolean,
 }
 
 
 export function AuthProvider({children}: Props) {
     const {userInfo: userInfoQuery = null, isLoading} = useUserInfo();
-    const [userInfo, setUserInfo] = useState<UserInfoResponse|null>(userInfoQuery);
-    useEffect(() => {
-        setUserInfo(userInfoQuery);
-    }, [userInfoQuery]);
 
-    return <AuthContext.Provider value={{userInfo, setUserInfo, isLoading}}>{children}</AuthContext.Provider>;
+    if (isLoading) return <h1>Loading</h1>;
+
+    return <AuthContext.Provider value={{userInfo: userInfoQuery, isLoading}}>{children}</AuthContext.Provider>;
 }
 
 export const useAuth = () => {
