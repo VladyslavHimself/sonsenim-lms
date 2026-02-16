@@ -12,7 +12,6 @@
 
     "cf:stage:deploy": "wrangler pages deploy ./dist --branch main",
 
-
     "coverage": "vitest --coverage",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "generate-pwa-assets": "pwa-assets-generator --preset minimal public/vite.svg"
