@@ -20,6 +20,7 @@ import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 import Profile from "@/pages/Profile/Profile.tsx";
 import Navbar from "@/pages/Navigation/Navbar.tsx";
 import ModalBoxProvider from "@/ModalBox/ModalBoxProvider.tsx";
+import {EnvInfoHighlightBar} from "@/components/EnvInfoHighlightBar/EnvInfoHighlightBar.tsx";
 
 const router = createBrowserRouter([
     {
@@ -93,6 +94,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                     <Toaster/>
                     <div className="app-container">
                         <RouterProvider router={router}/>
+                        <EnvInfoHighlightBar />
                     </div>
                 </ModalBoxProvider>
             </AuthProvider>

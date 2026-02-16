@@ -46,7 +46,6 @@ export default function NavSidebarList(
 {
     const queryClient = useQueryClient();
     const location = useLocation();
-    const navigate = useNavigate();
     const { logoutUser } = useLogout(() => {
         localStorage.removeItem('selectedGroup');
         queryClient.removeQueries();
