@@ -13,11 +13,13 @@ import {
 import {createCardsDAO} from "../models/dao/cards.dao";
 import {createDecksDAO} from "../models/dao/decks.dao";
 import unwrapBody from "../helpers/unwrapBody";
+import authHook from "../hooks/authHook";
 
 export const cardsRoute = new Elysia({
     name: 'cardsRoute',
     prefix: '/cards',
 })
+    .derive(authHook)
     .derive(({ db }) => {
         const DecksRepository = createDecksRepository({
             decksDAO: createDecksDAO(db),

@@ -1,5 +1,5 @@
 import {RESOURCE_SERVER_URL} from "@/constants/resource.ts";
-import {axiosInstance} from "@/api/axiosInstance.ts";
+import {axiosInstances} from "@/api/axiosInstances.ts";
 
 export type CardsIntervalHistoryResponse = {
     date: string;
@@ -12,7 +12,7 @@ export type CardsIntervalHistoryResponse = {
 const ProgressionHistoryApi = {
 
     getCardsIntervalHistory(groupId: string | number) {
-        return axiosInstance.get<CardsIntervalHistoryResponse[]>(`${RESOURCE_SERVER_URL}/api/history/${groupId}`);
+        return axiosInstances.get<CardsIntervalHistoryResponse[]>(`${RESOURCE_SERVER_URL}/api/history/${groupId}`);
     },
 }
 

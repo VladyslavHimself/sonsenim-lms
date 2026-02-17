@@ -1,6 +1,6 @@
 import {GroupConfigurationBody} from "@sonsenim/contracts";
 import {RESOURCE_SERVER_URL} from "@/constants/resource.ts";
-import {axiosInstance} from "@/api/axiosInstance.ts";
+import {axiosInstances} from "@/api/axiosInstances.ts";
 
 export type UserGroupResponse = {
     id: number,
@@ -20,27 +20,27 @@ export type UserGroupsInfoResponse = {
 
 const GroupsApi = {
     getUserGroups() {
-        return axiosInstance.get<UserGroupResponse[]>(`${RESOURCE_SERVER_URL}/api/groups/`);
+        return axiosInstances.get<UserGroupResponse[]>(`${RESOURCE_SERVER_URL}/api/groups/`);
     },
 
     getGroupStatistics(groupId: number) {
-        return axiosInstance.get<UserGroupsStatisticsResponse>(`${RESOURCE_SERVER_URL}/api/groups/stats/${groupId}`);
+        return axiosInstances.get<UserGroupsStatisticsResponse>(`${RESOURCE_SERVER_URL}/api/groups/stats/${groupId}`);
     },
 
     getUserGroupsInfo() {
-        return axiosInstance.get<UserGroupsInfoResponse[]>(`${RESOURCE_SERVER_URL}/api/groups/user-groups-info`);
+        return axiosInstances.get<UserGroupsInfoResponse[]>(`${RESOURCE_SERVER_URL}/api/groups/user-groups-info`);
     },
 
     addUserGroup(groupName: string) {
-        return axiosInstance.post(`${RESOURCE_SERVER_URL}/api/groups/${groupName}`);
+        return axiosInstances.post(`${RESOURCE_SERVER_URL}/api/groups/${groupName}`);
     },
 
     deleteUserGroup(groupId: number) {
-        return axiosInstance.delete(`${RESOURCE_SERVER_URL}/api/groups/${groupId}`);
+        return axiosInstances.delete(`${RESOURCE_SERVER_URL}/api/groups/${groupId}`);
     },
 
     updateUserGroup(groupId: number, groupConfiguration: GroupConfigurationBody) {
-        return axiosInstance.put<UserGroupResponse>(`${RESOURCE_SERVER_URL}/api/groups/${groupId}`, groupConfiguration);
+        return axiosInstances.put<UserGroupResponse>(`${RESOURCE_SERVER_URL}/api/groups/${groupId}`, groupConfiguration);
     }
 
 };
