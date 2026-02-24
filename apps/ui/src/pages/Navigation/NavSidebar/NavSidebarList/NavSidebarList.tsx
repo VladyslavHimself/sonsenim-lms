@@ -51,8 +51,7 @@ export default function NavSidebarList(
         localStorage.removeItem('selectedGroup');
         queryClient.removeQueries();
         queryClient.invalidateQueries({queryKey: ['user-info-me']}).then(r => r);
-
-        navigate('/signIn');
+        window.location.reload();
     });
 
     return useMemo(() => (

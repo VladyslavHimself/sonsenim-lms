@@ -1,4 +1,4 @@
-import { Context } from "elysia";
+import {Context, status} from "elysia";
 
 export default async function authHook(c: Context) {
     const { cookie, jwt, set} = c;
@@ -6,7 +6,8 @@ export default async function authHook(c: Context) {
 
     if (!token) {
         set.status = 401;
-        throw new Error('Unauthenticated');
+        // throw new Error('Unauthenticated');
+        return status(401, 'Unauthenticated')
     }
 
     const payload = await jwt.verify(token);

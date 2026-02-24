@@ -1,6 +1,6 @@
 import {CardConfigurationBody, UpdateCurveConfigurationBody} from "@sonsenim/contracts";
 import {RESOURCE_SERVER_URL} from "@/constants/resource.ts";
-import {axiosInstance} from "@/api/axiosInstance.ts";
+import {axiosInstances} from "@/api/axiosInstances.ts";
 
 export type Card = {
     cardId: number,
@@ -14,29 +14,29 @@ export type Card = {
 
 const CardsApi = {
     addCardToDeck(deckId: number, newCardConfiguration: CardConfigurationBody) {
-        return axiosInstance.post(`${RESOURCE_SERVER_URL}/api/cards/${deckId}`, newCardConfiguration);
+        return axiosInstances.post(`${RESOURCE_SERVER_URL}/api/cards/${deckId}`, newCardConfiguration);
     },
 
     getCardsToRepeatFromDeck(deckId: string) {
-        return axiosInstance.get<Card[]>(`${RESOURCE_SERVER_URL}/api/cards/${deckId}/to-repeat`);
+        return axiosInstances.get<Card[]>(`${RESOURCE_SERVER_URL}/api/cards/${deckId}/to-repeat`);
     },
 
 
     // TODO: Change id params to string in other areas
     getCardsInDeck(deckId: string) {
-        return axiosInstance.get<Card[]>(`${RESOURCE_SERVER_URL}/api/cards/${deckId}`);
+        return axiosInstances.get<Card[]>(`${RESOURCE_SERVER_URL}/api/cards/${deckId}`);
     },
 
     updateCard(cardId: string, deckId: string, cardConfiguration: CardConfigurationBody) {
-        return axiosInstance.put(`${RESOURCE_SERVER_URL}/api/cards/${deckId}/${cardId}`, cardConfiguration);
+        return axiosInstances.put(`${RESOURCE_SERVER_URL}/api/cards/${deckId}/${cardId}`, cardConfiguration);
     },
 
     removeCardFromDeck(deckId: string, cardId: string) {
-        return axiosInstance.delete(`${RESOURCE_SERVER_URL}/api/cards/${deckId}/${cardId}`);
+        return axiosInstances.delete(`${RESOURCE_SERVER_URL}/api/cards/${deckId}/${cardId}`);
     },
 
     updateCardTimeCurve(cardId: string, configuration: UpdateCurveConfigurationBody) {
-        return axiosInstance.patch(`${RESOURCE_SERVER_URL}/api/cards/${cardId}/update-curve`, configuration);
+        return axiosInstances.patch(`${RESOURCE_SERVER_URL}/api/cards/${cardId}/update-curve`, configuration);
     }
 };
 
