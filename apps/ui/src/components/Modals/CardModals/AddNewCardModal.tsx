@@ -40,7 +40,7 @@ export default function AddNewCardModal({deckId, refetchDecks}: Props) {
                     <ModalFormFieldInput style={{marginTop: 25}} name="definition" form={form.control}
                                          label="Definition *"/>
                     <ModalFormFieldInput style={{marginTop: 25}} name="explanation" form={form.control}
-                                         label="Description *"/>
+                                         label="Description"/>
                 </form>
             </Form>
         </ModalBoxBody>
