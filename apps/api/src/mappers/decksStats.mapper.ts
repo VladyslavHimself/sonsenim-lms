@@ -1,6 +1,4 @@
 import {DecksStatsResponsePersistence} from "../models/persistence/DecksStatsResponse.persistence";
-import {DeckPersistence} from "../models/persistence/Deck.persistence";
-import {Deck} from "../models/domain/Deck.model";
 import {getBaseDeckFields} from "./deck.mapper";
 
 export const decksStatsMapper = {

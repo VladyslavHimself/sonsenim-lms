@@ -71,6 +71,16 @@ export default function createCardsRepository(deps: {
         `;
     }
 
+    async function getAllUserCardsTotal(userId: string) {
+        const rows = await db`SELECT COUNT(c.id) AS total_cards_count
+                        FROM cards c
+                                 JOIN decks d ON d.id = c.deck_id
+                                 JOIN groups g ON g.id = d.group_id
+                        WHERE g.local_user_id = ${userId}`;
+
+        return filterRawSqlData(rows)[0].total_cards_count;
+    }
+
     return {
         addNewCardToDeck,
         deleteCard,
@@ -79,6 +89,7 @@ export default function createCardsRepository(deps: {
         countByGroupId,
         getCardsFromDeck,
         getDueCardsFromDeck,
-        getCardById
+        getCardById,
+        getAllUserCardsTotal
     }
 }
