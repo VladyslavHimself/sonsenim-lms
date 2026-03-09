@@ -21,7 +21,7 @@ export type UserInfoResponse = {
 
 const UserApi = {
     getLoggedInUserProfile() {
-        return axiosInstances.get<UserProfileResponse>(`${RESOURCE_SERVER_URL}/api/user-info/me`);
+        return axiosInstances.get<UserProfileResponse>(`${RESOURCE_SERVER_URL}/api/user/info`);
     },
 
     getUserInfo() {

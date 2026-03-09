@@ -42,5 +42,18 @@ export default function createCardsService(deps: {
         await cardsRepository.updateTimeCurveForCard(cardId, nextIntervalValue!, nextRepetitionDate);
     }
 
-    return { getCardsFromDeck, getDueCards, addNewCardToDeck, deleteCard, updateCard, updateTimeCurveForCard }
+    async function getUserCardsTotal(userId: string) {
+        const cardsTotal: number = await cardsRepository.getAllUserCardsTotal(userId);
+        return cardsTotal;
+    }
+
+    return {
+        getCardsFromDeck,
+        getDueCards,
+        addNewCardToDeck,
+        deleteCard,
+        updateCard,
+        updateTimeCurveForCard,
+        getUserCardsTotal
+    }
 }

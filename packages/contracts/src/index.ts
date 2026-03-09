@@ -10,3 +10,5 @@ export * from './resp/GroupResponse.schema';
 export * from './resp/CardResponse.schema';
 export * from './resp/DeckResponse.schema';
 export * from './resp/DecksStatsResponse.schema';
+export * from './resp/UserInfoResponse.schema';
+export * from './resp/DailyHistoryResponse.schema';

@@ -1,7 +1,8 @@
 import {RegistrationUserBody} from "@sonsenim/contracts";
+import {LocalUserPersistence} from "../persistence/LocalUser.persistence";
 
 export const createLocalUserDAO = (db: any) => ({
-    findById: async (id: number) => {
+    findById: async (id: string): Promise<LocalUserPersistence> => {
         const rows = await db`SELECT *
                                  FROM local_users
                                  WHERE id = ${id} LIMIT 1`;

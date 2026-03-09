@@ -1,4 +1,3 @@
-import {CardsIntervalHistoryResponse} from "@/api/progressionHistory/progressionHistory.ts";
 
 export const keyColors: KeyColorsType = {
     ['veryLowIndicationCount']: "#6ED132",
@@ -17,16 +16,17 @@ type KeyColorsType = {
 const keys = Object.keys(keyColors) as (keyof KeyColorsType)[];
 
 
-export function transformData(data: CardsIntervalHistoryResponse[]) {
-    const labels = data.map(item => item.date);
+export function transformData(data: any) {
+    const labels = Object.keys(data);
+
     const datasets = keys.map((key) => ({
         label: key,
-        data: data?.map(item  => item[key]),
+        data: Object.values(data)?.map(item  => item[key]),
         borderColor: keyColors[key],
     }));
 
     return {
         labels,
         datasets
-    };
+    }
 }

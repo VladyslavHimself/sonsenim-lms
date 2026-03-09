@@ -39,5 +39,10 @@ export const createDecksService = function (deps: {
         return await decksRepository.getGroupDecksWithCardsStatistics(group.id);
     }
 
-    return {getDecksFromGroup, getDecksStats, getDeck, addDeckToGroup, updateDeck, deleteDeck}
+    async function getUserDecksTotal(userId: string) {
+        const decksTotal: number = await decksRepository.getAllUserDecksTotal(userId);
+        return decksTotal;
+    }
+
+    return {getDecksFromGroup, getDecksStats, getDeck, addDeckToGroup, updateDeck, deleteDeck, getUserDecksTotal}
 }

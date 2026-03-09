@@ -4,10 +4,8 @@
   "scripts": {
     "n:dev": "bun run main.ts",
     "dev": "wrangler dev --env development",
-
     "cf:prod:deploy": "wrangler deploy --minify --env production",
     "cf:stage:deploy": "wrangler deploy --minify --env staging",
-
     "pg-migrate": "node-pg-migrate",
     "typecheck": "tsc"
   },
@@ -23,6 +21,7 @@
     "@elysiajs/openapi": "^1.4.12",
     "@sonsenim/contracts": "workspace:*",
     "bcryptjs": "^3.0.3",
+    "dayjs": "^1.11.19",
     "elysia": "1",
     "node-pg-migrate": "^8.0.4",
     "postgres": "^3.4.7"

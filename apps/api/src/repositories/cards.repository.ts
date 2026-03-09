@@ -23,10 +23,15 @@ export default function createCardsRepository(deps: {
         return cardsDAO.countByGroupId(groupId);
     }
 
+    async function findGroupByCardId(cardId: string) {
+        const [ rows ] = await db`SELECT d.group_id as groupid FROM cards c JOIN decks d ON c.deck_id = d.id WHERE c.id = ${cardId}`;
+        return rows?.groupid || null;
+    }
+
     async function addNewCardToDeck(deckId: string, cardConfiguration: CardConfigurationBody) {
         const existingDeck = await decksRepository.findDeck(deckId);
-
-        return cardsDAO.add(existingDeck.id, cardConfiguration);
+        const newCard = await cardsDAO.add(existingDeck.id, cardConfiguration);
+        return cardMapper.toDTO(newCard[0]);
     }
 
     async function deleteCard(deckId: string, cardId: string) {
@@ -71,6 +76,16 @@ export default function createCardsRepository(deps: {
         `;
     }
 
+    async function getAllUserCardsTotal(userId: string) {
+        const rows = await db`SELECT COUNT(c.id) AS total_cards_count
+                        FROM cards c
+                                 JOIN decks d ON d.id = c.deck_id
+                                 JOIN groups g ON g.id = d.group_id
+                        WHERE g.local_user_id = ${userId}`;
+
+        return filterRawSqlData(rows)[0].total_cards_count;
+    }
+
     return {
         addNewCardToDeck,
         deleteCard,
@@ -79,6 +94,8 @@ export default function createCardsRepository(deps: {
         countByGroupId,
         getCardsFromDeck,
         getDueCardsFromDeck,
-        getCardById
+        getCardById,
+        getAllUserCardsTotal,
+        findGroupByCardId
     }
 }

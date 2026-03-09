@@ -10,6 +10,7 @@ import {userRoutes} from "./routes/user.route";
 import {groupsRoute} from "./routes/groups.route";
 import {decksRoute} from "./routes/decks.route";
 import {cardsRoute} from "./routes/cards.route";
+import {progressionHistoryRoutes} from "./routes/progressionHistory.route";
 
 export const app = new Elysia({
     name: "main",
@@ -27,3 +28,4 @@ export const app = new Elysia({
     .use(groupsRoute)
     .use(decksRoute)
     .use(cardsRoute)
+    .use(progressionHistoryRoutes)

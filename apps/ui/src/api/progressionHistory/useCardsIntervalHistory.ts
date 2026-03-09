@@ -9,7 +9,8 @@ export default function useCardsIntervalHistory(deckId: string | number) {
     const { data: cardsIntervalHistoryData, isLoading, refetch} = useQuery({
         queryKey: ['cards-interval-history', deckId],
         queryFn: () => ProgressionHistoryApi.getCardsIntervalHistory(deckId).then(({ data }) => {
-            setActualDayInfo(data[data.length - 1]);
+            const lastDayAccessor = Object.keys(data).pop();
+            setActualDayInfo(data[lastDayAccessor]);
             return data;
         })
     });

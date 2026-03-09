@@ -10,18 +10,28 @@ import {deckMapper} from "../mappers/deck.mapper";
 import {createDecksDAO} from "../models/dao/decks.dao";
 import createGroupsRepository from "../repositories/groups.repository";
 import {createGroupsDAO} from "../models/dao/Groups.dao";
-import {userInfoResponseDtoMapper} from "../models/dto/userInfoResponseDto.mapper";
+import createProgressionHistoryService from "../services/progressionHistory.service";
+import createProgressionHistoryRepository from "../repositories/progressionHistory.repository";
+import authHook from "../hooks/authHook";
+import {createProgressionHistoryDAO} from "../models/dao/progressionHistory.dao";
 
-
-export const userRoutes = new Elysia({
-    name: 'userRoute',
-    prefix: '/user'
+export const progressionHistoryRoutes = new Elysia({
+    name: 'progressstionHistory',
+    prefix: '/history'
 })
+    .derive(authHook)
     .derive(({db}) => {
+        const ProgressionHistoryDAO = createProgressionHistoryDAO(db)
+
         const DecksRepository = createDecksRepository({
             db: db,
             deckMapper: deckMapper, decksDAO: createDecksDAO(db)
         });
+
+        const ProgressionHistoryRepository = createProgressionHistoryRepository({
+            db: db,
+            progressionHistoryDao: ProgressionHistoryDAO
+        })
 
         const CardsRepository = createCardsRepository({
             decksRepository: DecksRepository,
@@ -47,31 +57,18 @@ export const userRoutes = new Elysia({
             groupsRepository: GroupsRepository,
         });
 
+        const ProgressionHistoryService = createProgressionHistoryService({
+            progressionHistoryRepository: ProgressionHistoryRepository,
+            cardsRepository: CardsRepository
+        });
+
         return {
             userService: UserService,
             cardsService: CardsService,
             decksService: DecksService,
+            progressionHistoryService: ProgressionHistoryService
         };
     })
-    .get('/me', async ({jwt, status, cookie: {auth}, userService}) => {
-        const payload = await jwt.verify(auth!.value);
-        if (!payload) return status(401, 'Unauthorized');
-
-        const user = await userService.getUserInfo(payload.sub);
-
-        return {
-            id: user.id,
-            username: user.username,
-        };
-
-    })
-
-    .get('/info', async ({userService, cardsService, decksService, jwt, cookie: {auth}}) => {
-        const {sub} = await jwt.verify(auth!.value) || {};
-        const user = sub && await userService.getUserInfo(sub);
-
-        const decksTotal = await decksService.getUserDecksTotal(user.id);
-        const cardsTotal = await cardsService.getUserCardsTotal(user.id);
-
-        return userInfoResponseDtoMapper.toDTO(user, decksTotal, cardsTotal);
+    .get(`/:groupId`, async ({progressionHistoryService, params}) => {
+        return progressionHistoryService.getGroupCardsIntervalHistory(params.groupId);
     })

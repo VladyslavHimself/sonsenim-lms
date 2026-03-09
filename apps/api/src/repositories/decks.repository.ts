@@ -65,6 +65,15 @@ export default function createDecksRepository(deps: {
         return decksDAO.delete(deckId);
     }
 
+    async function getAllUserDecksTotal(userId: string) {
+        const rows = await db`SELECT COUNT(d.id) AS total_user_decks
+                              FROM decks d
+                                       LEFT JOIN groups g ON g.id = d.group_id
+                              WHERE g.local_user_id = ${userId}`;
+
+        return filterRawSqlData(rows)[0].total_user_decks;
+    }
+
     return {
         getGroupDecks,
         getGroupDecksWithCardsStatistics,
@@ -72,6 +81,7 @@ export default function createDecksRepository(deps: {
         findDeck,
         updateDeck,
         deleteDeck,
-        countByGroupId
+        countByGroupId,
+        getAllUserDecksTotal
     };
 }
