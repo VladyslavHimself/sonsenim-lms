@@ -24,7 +24,7 @@ export const createCardsDAO = (db: any) => ({
         const prePersistIntervalStrengthValue = 0;
         return db`INSERT INTO cards (deck_id, primary_word, explanation, definition, interval_strength)
                      VALUES (${deckId}, ${primaryWord}, ${explanation || ""},
-                             ${definition}, ${prePersistIntervalStrengthValue})`;
+                             ${definition}, ${prePersistIntervalStrengthValue}) RETURNING *`;
     },
 
     findById: async (cardId: string) => {
