@@ -24,7 +24,7 @@ const createProgressionHistoryService = function (deps: {
 
     // TODO: Change param to receive just group id
     async function updateUserCardsHistory(cardId: string) {
-        // TODO: Change after timezonte testing (P3)
+        // TODO: Change after timezone testing (P3)
         const actualDay = dayjs().startOf('day').format('YYYY-MM-DD');
         const cardGroupId = await cardsRepository.findGroupByCardId(cardId);
 
@@ -34,7 +34,7 @@ const createProgressionHistoryService = function (deps: {
             return progressionHistoryRepository.createNewHistory(cardGroupId, userCardStats);
         }
 
-        return progressionHistoryRepository.updateHistory(cardGroupId, userCardStats);
+        return progressionHistoryRepository.updateHistory(cardGroupId, userCardStats, actualDay);
     }
 
     function _fulfillProgressionHistory(startDay: any, historyMap: ProgressionHistoryMap): ProgressionHistoryMap {

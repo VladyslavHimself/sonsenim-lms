@@ -62,9 +62,8 @@ export default function createProgressionHistoryRepository(deps: {
         return progressionHistoryDao.save(groupId, stats);
     }
 
-    async function updateHistory(groupId: string, stats: ProgressionHistoryStats) {
-        console.log('updating history');
-        return progressionHistoryDao.update(groupId, stats);
+    async function updateHistory(groupId: string, stats: ProgressionHistoryStats, date: string) {
+        return progressionHistoryDao.update(groupId, stats, date);
     }
 
 

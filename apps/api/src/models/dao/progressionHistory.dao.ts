@@ -14,7 +14,7 @@ export const createProgressionHistoryDAO = (db: any) => ({
     },
 
     // TODO: As tech debt - refactor all 'update' methods to optional pass flexible data. (P2)
-    update: async (groupId: string, body: Partial<ProgressionHistoryEntity>) => {
+    update: async (groupId: string, body: Partial<ProgressionHistoryEntity>, date: string) => {
         const {veryLowIndicationCount, lowIndicationCount, midIndicationCount, highIndicationCount} = body;
         return db`UPDATE users_progression_history
                   SET very_low_indication_count = ${veryLowIndicationCount},
@@ -22,6 +22,7 @@ export const createProgressionHistoryDAO = (db: any) => ({
                       mid_indication_count      = ${midIndicationCount},
                       high_indication_count     = ${highIndicationCount}
                   WHERE group_id = ${groupId}
+                    AND created_at::DATE = ${date}::DATE
                   RETURNING *`;
     }
 
