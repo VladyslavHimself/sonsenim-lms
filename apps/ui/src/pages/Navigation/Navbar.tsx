@@ -13,6 +13,7 @@ export default function Navbar() {
     const Navigation = isMobileResolution ? MobileNavbar : NavSidebar;
 
     React.useEffect(() => {
+        console.log('install fired');
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('install') === 'true') {
             window.addEventListener('beforeinstallprompt', (e) => {
