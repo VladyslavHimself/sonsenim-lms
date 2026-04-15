@@ -2,6 +2,7 @@ import {useMutation} from "@tanstack/react-query";
 import {CardsApi} from "@/api";
 import {toast} from "@/components/ui/use-toast.ts";
 import {CardConfigurationBody} from "@sonsenim/contracts";
+import {getAsyncStatus} from "@/api/getAsyncStatusFn.ts";
 
 type CardConfigurationVariables = {
     deckId: number,
@@ -9,7 +10,7 @@ type CardConfigurationVariables = {
 }
 
 export default function useAddNewCardMutation(callback: Function) {
-    const { mutate: addNewCard } = useMutation({
+    const {mutate: addNewCard, isIdle, isError, isSuccess, isPending} = useMutation({
         mutationKey: ['add-new-card'],
         mutationFn: (variables: CardConfigurationVariables) =>
             CardsApi.addCardToDeck(variables.deckId, variables.cardConfiguration),
@@ -23,5 +24,7 @@ export default function useAddNewCardMutation(callback: Function) {
         })
     });
 
-    return { addNewCard };
+    const asyncStatus = getAsyncStatus(isIdle, isPending, isError, isSuccess);
+
+    return {addNewCard, asyncStatus};
 }

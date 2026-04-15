@@ -21,8 +21,8 @@ type Props = {
 }
 
 export function EditGroupModal({modal, refetchGroups, currentGroup}: Props) {
-    const {deleteUserGroup} = useDeleteUserGroupMutation(onMakeModalAction);
-    const {updateUserGroup} = useUpdateUserGroupMutation(onMakeModalAction);
+    const {deleteUserGroup, asyncStatus: removeUserGroupAsyncStatus} = useDeleteUserGroupMutation(onMakeModalAction);
+    const {updateUserGroup, asyncStatus: updateUserGroupAsyncStatus} = useUpdateUserGroupMutation(onMakeModalAction);
 
     const form = useForm<z.infer<typeof groupFieldsSchema>>({
         resolver: zodResolver(groupFieldsSchema),
@@ -56,13 +56,17 @@ export function EditGroupModal({modal, refetchGroups, currentGroup}: Props) {
             <ModalBoxConfirmationFooter
                 closeButtonProperties={{
                     label: <Trash2Icon/>,
-                    action: () => deleteUserGroup(currentGroup.groupId)
+                    action: () => deleteUserGroup(currentGroup.groupId),
+                    async: true,
+                    asyncStatus: removeUserGroupAsyncStatus
                 }}
 
                 submitButtonProperties={{
                     label: 'Edit',
                     formId: 'edit-group-form',
-                    restProps: {disabled: form.getValues().groupName === currentGroup.groupName}
+                    restProps: {disabled: form.getValues().groupName === currentGroup.groupName},
+                    async: true,
+                    asyncStatus: updateUserGroupAsyncStatus
                 }}
 
             />

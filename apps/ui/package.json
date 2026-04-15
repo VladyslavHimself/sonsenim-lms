@@ -6,12 +6,9 @@
     "dev": "vite --host",
     "dev:staging": "vite --host --env staging",
     "n:build": "vite build",
-
     "w:prev": "vite build && wrangler pages dev",
     "n:preview": "vite preview --host",
-
     "cf:stage:deploy": "wrangler pages deploy ./dist --branch main",
-
     "coverage": "vitest --coverage",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "generate-pwa-assets": "pwa-assets-generator --preset minimal public/vite.svg"
@@ -30,11 +27,11 @@
     "@radix-ui/react-toast": "^1.2.1",
     "@radix-ui/react-toggle": "^1.1.0",
     "@radix-ui/react-toggle-group": "^1.1.0",
+    "@sonsenim/contracts": "workspace:*",
     "@tanstack/react-query": "^5.51.3",
     "@tanstack/react-query-devtools": "^5.59.16",
     "@tanstack/react-table": "^8.20.1",
     "@types/axios": "^0.14.0",
-    "@sonsenim/contracts": "workspace:*",
     "axios": "^1.7.2",
     "chart.js": "^4.4.6",
     "class-variance-authority": "^0.7.0",
@@ -52,6 +49,7 @@
     "react-router-dom": "^6.24.1",
     "recharts": "^2.12.7",
     "scss": "^0.2.4",
+    "spinner": "^0.3.4",
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^13.0.0",

@@ -25,7 +25,7 @@ const signUpSchema = z.object({
 
 export default function SignUp() {
     const navigate = useNavigate();
-    const { registerUser } = useSignUp(() => navigate('/signIn'));
+    const { registerUser, asyncStatus } = useSignUp(() => navigate('/signIn'));
     const form = useForm<z.infer<typeof signUpSchema>>({
         resolver: zodResolver(signUpSchema)
     })
@@ -88,7 +88,7 @@ export default function SignUp() {
                         />
 
                         <div className="auth-container-body">
-                            <Button className="auth-container-submit-button" size="lg"
+                            <Button async asyncStatus={asyncStatus} className="auth-container-submit-button" size="lg"
                                     style={{fontFamily: 'Gilroy Bold, sans-serif', fontWeight: 'bold', fontSize: 18, borderRadius: 12, width: 400}}>
                                 Create an account
                             </Button>

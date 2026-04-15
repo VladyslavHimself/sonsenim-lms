@@ -15,7 +15,7 @@ import SelectedGroupPage from "@/pages/SelectedGroupPage.tsx";
 import CardListPage from "@/pages/CardListPage.tsx";
 import MemoizationPage from "@/pages/Memoization/MemoizationPage.tsx";
 import MemoizationPageProvider from "@/pages/Memoization/MemoizationPageProvider.tsx";
-import MemoizationReview from "@/pages/MemoizationReview.tsx";
+import {MemoizationReview} from "@/pages/MemoizationReview.tsx";
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 import Profile from "@/pages/Profile/Profile.tsx";
 import Navbar from "@/pages/Navigation/Navbar.tsx";

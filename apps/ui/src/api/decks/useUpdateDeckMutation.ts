@@ -2,6 +2,7 @@ import {useMutation} from "@tanstack/react-query";
 import {DecksApi} from "@/api/decks/decks.ts";
 import {toast} from "@/components/ui/use-toast.ts";
 import {DeckResponse} from "@sonsenim/contracts";
+import {getAsyncStatus} from "@/api/getAsyncStatusFn.ts";
 
 
 export type EditDeckMutationVariables = {
@@ -10,9 +11,12 @@ export type EditDeckMutationVariables = {
 }
 
 export default function useUpdateDeckMutation(callback: Function) {
-    const { mutate: updateDeck } = useMutation({
+    const {mutate: updateDeck, isIdle, isPending, isError, isSuccess} = useMutation({
         mutationKey: ['update-deck'],
-        mutationFn: ({ deckId, deckConfiguration }: EditDeckMutationVariables) => DecksApi.updateDeck(deckId, deckConfiguration),
+        mutationFn: ({
+                         deckId,
+                         deckConfiguration
+                     }: EditDeckMutationVariables) => DecksApi.updateDeck(deckId, deckConfiguration),
         onSuccess: (data, variables, context) => {
             callback(data, variables, context);
         },
@@ -24,5 +28,7 @@ export default function useUpdateDeckMutation(callback: Function) {
             })
     });
 
-    return { updateDeck };
+    const asyncStatus = getAsyncStatus(isIdle, isPending, isError, isSuccess);
+
+    return {updateDeck, asyncStatus};
 }

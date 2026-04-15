@@ -19,7 +19,7 @@ type Props = {
 
 export default function CreateNewDeckModal({ groupId, modal }: Props) {
     const { refetch } = useAggregatedDecks(groupId!.toString());
-    const { addDeckToGroup } = useAddDeckToGroupMutation(() => {
+    const { addDeckToGroup, asyncStatus } = useAddDeckToGroupMutation(() => {
         refetch();
         modal.close(modal.id);
     });
@@ -53,6 +53,8 @@ export default function CreateNewDeckModal({ groupId, modal }: Props) {
                 submitButtonProperties={{
                     label: 'Create',
                     formId: 'create-deck-form',
+                    asyncStatus: asyncStatus,
+                    async: true
                 }}
             />
         </>

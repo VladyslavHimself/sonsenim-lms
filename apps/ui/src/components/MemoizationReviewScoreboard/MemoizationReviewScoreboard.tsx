@@ -4,19 +4,22 @@ import LevelIndicator from "@/components/LevelIndicator/LevelIndicator.tsx";
 import {resolveIntervalStrValues, resolveStrengthLevel} from "@/generals.service.ts";
 import {ArrowRight} from "lucide-react";
 import {useMediaQuery} from "react-responsive";
+import {Spinner} from "@/components/ui/spinner.tsx";
 
 
 type Props = {
-    scoreList: CardComparisonType[]
+    scoreList: CardComparisonType[],
+    isLoading: boolean,
 }
 
 
 // TODO: Divide to smaller components
-export default function MemoizationReviewScoreboard({ scoreList }: Props) {
+export default function MemoizationReviewScoreboard({ scoreList, isLoading }: Props) {
     const isMobile = useMediaQuery({query: "(max-width: 700px)"});
     return (
         <>
             <div className="review-scoreboard">
+                {isLoading && <Spinner className="m-auto h-full" />}
                 {
                     scoreList.map(score => {
                         const { definition, previousIntervalStr, actualIntervalStr } = score;

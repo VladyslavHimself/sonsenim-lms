@@ -23,8 +23,8 @@ type Props = {
 type deckConfigurationFieldsSchemaTypes = z.infer<typeof deckConfigurationFieldsSchema>;
 
 export default function EditDeckModal({ deckProperties, refetchDecks, modal }: Props) {
-    const { deleteDeck } = useDeleteDeckMutation(onMakeModalAction);
-    const { updateDeck } = useUpdateDeckMutation(onMakeModalAction);
+    const { deleteDeck, asyncStatus: deleteDeckAsyncStatus } = useDeleteDeckMutation(onMakeModalAction);
+    const { updateDeck, asyncStatus: updateDeckAsyncStatus } = useUpdateDeckMutation(onMakeModalAction);
 
 
     const form = useForm<deckConfigurationFieldsSchemaTypes>({
@@ -74,11 +74,16 @@ export default function EditDeckModal({ deckProperties, refetchDecks, modal }: P
             <ModalBoxConfirmationFooter
                 closeButtonProperties={{
                     label: <Trash2Icon />,
-                    action: () => deleteDeck(deckProperties.id)
+                    action: () => deleteDeck(deckProperties.id),
+                    async: true,
+                    asyncStatus: deleteDeckAsyncStatus
                 }}
                 submitButtonProperties={{
                     label: 'Edit',
                     formId: 'edit-deck-form',
+                    restProps: {disabled: form.getValues().name === deckProperties.name},
+                    async: true,
+                    asyncStatus: updateDeckAsyncStatus
                 }}
             />
         </>

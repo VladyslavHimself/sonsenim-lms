@@ -33,12 +33,14 @@ export function ModalBoxBody({children}) {
 }
 
 export function ModalBoxConfirmationFooter({closeButtonProperties, submitButtonProperties}: ConfirmationFooterModalProps) {
+    console.log(closeButtonProperties);
     return (
         <div className="modal-box-footer">
             {
                 closeButtonProperties && <Button
                     onClick={closeButtonProperties.action}
                     className="modal-box-cancel-button"
+                    asyncStatus={closeButtonProperties?.async && closeButtonProperties?.asyncStatus}
                     {...closeButtonProperties.restProps}
                 >{closeButtonProperties.label}</Button>
             }
@@ -46,6 +48,7 @@ export function ModalBoxConfirmationFooter({closeButtonProperties, submitButtonP
                 form={submitButtonProperties?.formId}
                 type="submit"
                 className="modal-box-submit-button"
+                asyncStatus={submitButtonProperties?.async && submitButtonProperties?.asyncStatus}
                 {...submitButtonProperties?.restProps}
             >{submitButtonProperties?.label}</Button>
         </div>

@@ -16,7 +16,7 @@ type Props = {
 }
 
 export default function AddNewCardModal({deckId, refetchDecks}: Props) {
-    const {addNewCard} = useAddNewCardMutation(() => {
+    const {addNewCard, asyncStatus} = useAddNewCardMutation(() => {
         refetchDecks();
         form.setValue('primaryWord', '')
         form.setValue('definition', '')
@@ -48,6 +48,8 @@ export default function AddNewCardModal({deckId, refetchDecks}: Props) {
             submitButtonProperties={{
                 label: "Add new card",
                 formId: "add-new-card-form",
+                asyncStatus: asyncStatus,
+                async: true
             }}
         />
     </>
