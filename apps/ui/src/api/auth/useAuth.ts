@@ -17,28 +17,31 @@ export default function useSignIn(callback: Function) {
     } = useMutation({
         mutationKey: ['user-auth'],
         mutationFn: function (credentials: LoginUserBody) {
-            return AuthApi.loginUser(credentials).then(({data}) => data);
+            return AuthApi.loginUser(credentials).then((data) => ({...data}));
         },
         onSuccess: (data, variables, context) => {
             callback(data, variables, context);
         },
         onError: (error) => {
             // @ts-expect-error response provided
-            const UNAUTHORIZED_STATUS = error.response.status === 401
+            const {data, status} = error['response'];
 
-            if (UNAUTHORIZED_STATUS) {
+            if (`${status}`.startsWith("4")) {
                 toast({
                     variant: "destructive",
-                    title: "Authorization failed",
-                    description: "Login failed - your username or password is incorrect. Please try again."
+                    title: `${data}`,
+                    description: `Authorization failed: ${data}`
                 })
-            } else {
-                toast({
-                    variant: "destructive",
-                    title: "Authorization failed",
-                    description: "There was a problem with your request. Please try again later..."
-                })
+
+                return;
             }
+
+
+            toast({
+                variant: "destructive",
+                title: "Authorization failed",
+                description: "There was a problem with your request. Please try again later."
+            })
         }
     });
 

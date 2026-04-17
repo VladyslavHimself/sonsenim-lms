@@ -9,18 +9,9 @@ import {useForm} from "react-hook-form";
 import {FormControl, FormField, FormItem, FormLabel, Form} from "@/components/ui/form.tsx";
 import useSignIn from "@/api/auth/useAuth.ts";
 import {useAuth} from "@/security/AuthProvider.tsx";
-import React, {useEffect} from "react";
+import React from "react";
 import {useQueryClient} from "@tanstack/react-query";
-
-const signInSchema = z.object({
-    username: z.string().min(2, {
-        message: "Username must be at least 2 characters"
-    }),
-    password: z.string().min(4, {
-        message: "Password must be at least 4 characters"
-    }),
-})
-
+import {LoginUserBodySchema} from "@sonsenim/contracts";
 
 export default function SignIn() {
     const {userInfo} = useAuth();
@@ -29,24 +20,20 @@ export default function SignIn() {
     const {loginUser, asyncStatus} = useSignIn(() => {
         queryClient.invalidateQueries({queryKey: ['user-info-me']}).then(r => r);
     });
-    const form = useForm<z.infer<typeof signInSchema>>({
-        resolver: zodResolver(signInSchema),
+    const form = useForm<z.infer<typeof LoginUserBodySchema>>({
+        resolver: zodResolver(LoginUserBodySchema),
         defaultValues: {
             username: "",
             password: ""
         }
     })
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (userInfo?.id) {
             navigate('/dashboard', {replace: true});
             return;
         }
     }, [userInfo, navigate]);
-
-    React.useEffect(() => {
-        console.log('status: ', asyncStatus);
-    },[asyncStatus])
 
     return (
         <div className="auth-wrapper">
@@ -57,7 +44,7 @@ export default function SignIn() {
                 </div>
 
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit((values: z.infer<typeof signInSchema>) => loginUser(values))}>
+                    <form onSubmit={form.handleSubmit((values: z.infer<typeof LoginUserBodySchema>) => loginUser(values))}>
                         <FormField name="username" control={form.control} render={({field}) => (
                             <FormItem style={{width: 330, marginTop: 15}}>
                                 <FormLabel className="auth-container-input-label">Username</FormLabel>
