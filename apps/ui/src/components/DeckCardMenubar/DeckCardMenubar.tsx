@@ -5,6 +5,7 @@ import EditDeckModal from "@/components/Modals/DeckModals/EditDeckModal.tsx";
 import AddNewCardModal from "@/components/Modals/CardModals/AddNewCardModal.tsx";
 import {NavigateFunction} from "react-router-dom";
 import {Modal, ModalInstance} from "@/ModalBox/modalBox.ts";
+import ImportCardsModal from "@/components/Modals/ImportCardsModal/ImportCardsModal.tsx";
 
 type Props = {
     modal: ModalInstance,
@@ -17,18 +18,20 @@ type Props = {
 
 
 export default function DeckCardMenubar({modal, deckProperties, refetchDecks, groupId, navigate}: Props) {
-    const { dueCardsInDeck } = deckProperties;
+    const {dueCardsInDeck} = deckProperties;
 
     return (
         <div className="deck-menubar-container">
-            <Button disabled={!+dueCardsInDeck} variant="outline" className="menubar-list-item" onClick={openMemoizationPage}><Brain/> Start
+            <Button disabled={!+dueCardsInDeck} variant="outline" className="menubar-list-item"
+                    onClick={openMemoizationPage}><Brain/> Start
                 Learning</Button>
             <Button variant="outline" className="menubar-list-item" onClick={onAddNewCardHandle}><PlusIcon/> Add new
                 card</Button>
             <Button variant="outline" className="menubar-list-item" onClick={openCardListPage}><List/>Card List</Button>
             <Button variant="outline" className="menubar-list-item" onClick={onEditDeckHandle}><Edit/>Edit deck</Button>
-            <Button disabled variant="outline" className="menubar-list-item"><Upload/>Export cards</Button>
-            <Button disabled variant="outline" className="menubar-list-item"><Download/>Import cards</Button>
+            <Button variant="outline" className="menubar-list-item" onClick={onExportCardsHandle}><Upload/>Export cards</Button>
+            <Button variant="outline" className="menubar-list-item" onClick={onImportCardsHandle}><Download/>Import
+                cards</Button>
         </div>
     );
 
@@ -52,5 +55,14 @@ export default function DeckCardMenubar({modal, deckProperties, refetchDecks, gr
     function openMemoizationPage() {
         navigate(`/memoization/${deckProperties.id}`);
         modal.close(modal.id);
+    }
+
+    function onImportCardsHandle() {
+        Modal.open((modal) => <ImportCardsModal modal={modal} deckId={deckProperties.id}/>,
+            'Edit deck', 'import-cards-modal');
+        modal.close(modal.id);
+    }
+
+    function onExportCardsHandle() {
     }
 }
