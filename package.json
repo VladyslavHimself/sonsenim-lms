@@ -8,26 +8,26 @@
     "ui:coverage": "pnpm --filter ui coverage",
     "ui:stage:deploy": "pnpm --filter ui cf:stage:deploy",
     "ui:build": "pnpm --filter ui n:build",
-
     "api:dev": "pnpm --filter api start",
-
     "db:migrate": "dbmate migrate",
     "db:status": "dbmate status",
-
     "api:prod:deploy": "pnpm --filter api cf:prod:deploy",
     "api:staging:deploy": "pnpm --filter api cf:stage:deploy",
     "w:api:dev": "pnpm --filter api w:dev",
     "dev": "pnpm run start:ui & pnpm run start:api",
     "build": "pnpm recursive run build",
-
     "app:dev": "pnpm -r --parallel --stream --filter ui --filter api run dev",
     "app:staging": "pnpm -r --parallel --stream --filter ui --filter api run staging"
   },
   "keywords": [],
   "author": "Vladyslav Lutchyn <vladyslav.lutchyn@gmail.com>",
   "license": "ISC",
-  "packageManager": "pnpm@10.29.1",
+  "packageManager": "pnpm@10.33.3",
   "devDependencies": {
     "wrangler": "^4.63.0"
+  },
+  "dependencies": {
+    "radix-ui": "^1.4.3",
+    "ui": "^0.2.4"
   }
 }
