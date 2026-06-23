@@ -5,7 +5,8 @@ import EditDeckModal from "@/components/Modals/DeckModals/EditDeckModal.tsx";
 import AddNewCardModal from "@/components/Modals/CardModals/AddNewCardModal.tsx";
 import { NavigateFunction } from "react-router-dom";
 import { Modal, ModalInstance } from "@/ModalBox/modalBox.ts";
-import ImportCardsModal from "@/components/Modals/ImportCardsModal/ImportCardsModal.tsx";
+import ImportCardsModal from "@/components/Modals/ImportExportCardsModal/ImportCardsModal.tsx";
+import ExportCardsModal from "@/components/Modals/ImportExportCardsModal/ExportCardsModal.tsx";
 
 type Props = {
   modal: ModalInstance,
@@ -64,5 +65,8 @@ export default function DeckCardMenubar({ modal, deckProperties, refetchDecks, g
   }
 
   function onExportCardsHandle() {
+    Modal.open((modal) => <ExportCardsModal modal={modal} deckId={deckProperties.id} />,
+        'Export cards from deck', 'export-cards-modal');
+    modal.close(modal.id);
   }
 }
