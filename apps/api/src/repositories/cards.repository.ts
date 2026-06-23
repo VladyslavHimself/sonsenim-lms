@@ -23,8 +23,26 @@ export default function createCardsRepository(deps: {
         return cardsDAO.countByGroupId(groupId);
     }
 
+    async function addNewCardsToDeck(deckId: string, cards: CardConfigurationBody[]) {
+        const payload = cards.map(card => ({
+            deck_id: deckId,
+            primary_word: card.primaryWord,
+            definition: card.definition,
+            explanation: card.explanation,
+        }));
+
+        const rows = await db`
+            INSERT INTO cards ${db(payload)} RETURNING id, deck_id, primary_word, definition, explanation;
+        `;
+
+        return rows.map((row: CardPersistence) => cardMapper.toDTO(row));
+    }
+
     async function findGroupByCardId(cardId: string) {
-        const [ rows ] = await db`SELECT d.group_id as groupid FROM cards c JOIN decks d ON c.deck_id = d.id WHERE c.id = ${cardId}`;
+        const [rows] = await db`SELECT d.group_id as groupid
+                                FROM cards c
+                                         JOIN decks d ON c.deck_id = d.id
+                                WHERE c.id = ${cardId}`;
         return rows?.groupid || null;
     }
 
@@ -60,9 +78,10 @@ export default function createCardsRepository(deps: {
         const existingDeck = await decksRepository.findDeck(deckId);
 
         const cards = await db`SELECT c.*
-                                  FROM cards c
-                                  WHERE c.deck_id = ${existingDeck.id} AND (c.next_repetition_time IS NULL
-                                     OR c.next_repetition_time < ${new Date()})`;
+                               FROM cards c
+                               WHERE c.deck_id = ${existingDeck.id}
+                                 AND (c.next_repetition_time IS NULL
+                                   OR c.next_repetition_time < ${new Date()})`;
 
         return cardMapper.toDTOList(cards);
     }
@@ -71,23 +90,24 @@ export default function createCardsRepository(deps: {
         const card: Card = await cardsDAO.findById(cardId);
 
         return db`UPDATE cards
-                     SET (interval_strength, next_repetition_time) = (${nextIntervalValue}, ${nextRepetitionDate})
-                     WHERE id = ${card.id}
+                  SET (interval_strength, next_repetition_time) = (${nextIntervalValue}, ${nextRepetitionDate})
+                  WHERE id = ${card.id}
         `;
     }
 
     async function getAllUserCardsTotal(userId: string) {
         const rows = await db`SELECT COUNT(c.id) AS total_cards_count
-                        FROM cards c
-                                 JOIN decks d ON d.id = c.deck_id
-                                 JOIN groups g ON g.id = d.group_id
-                        WHERE g.local_user_id = ${userId}`;
+                              FROM cards c
+                                       JOIN decks d ON d.id = c.deck_id
+                                       JOIN groups g ON g.id = d.group_id
+                              WHERE g.local_user_id = ${userId}`;
 
         return filterRawSqlData(rows)[0].total_cards_count;
     }
 
     return {
         addNewCardToDeck,
+        addNewCardsToDeck,
         deleteCard,
         updateCard,
         updateTimeCurveForCard,

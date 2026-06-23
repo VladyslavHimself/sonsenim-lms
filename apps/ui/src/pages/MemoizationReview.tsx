@@ -6,6 +6,7 @@ import useCards from "@/api/cards/useCards.ts";
 import {useMemo} from "react";
 import {Card} from "@/api/cards/cards.ts";
 import MemoizationReviewScoreboard from "@/components/MemoizationReviewScoreboard/MemoizationReviewScoreboard.tsx";
+import {Spinner} from "@/components/ui/spinner.tsx";
 
 export type CardComparisonType = {
     definition: string;
@@ -13,10 +14,10 @@ export type CardComparisonType = {
     actualIntervalStr: number,
 }
 
-export default function MemoizationReview() {
+export function MemoizationReview() {
     const navigate = useNavigate();
     const {state} = useLocation();
-    const { deckCards } = useCards(state.deckId);
+    const {deckCards, isLoading} = useCards(state.deckId);
 
     const scoreList: CardComparisonType[] = useMemo(() => {
         return state?.cardsSnapshot.reduce((accumulator: Card[], card: Card) => {
@@ -30,6 +31,7 @@ export default function MemoizationReview() {
         }, []);
     }, [deckCards, state]);
 
+
     return (
         <div className="memoization-page layout-wrapper">
             <div className="memoization-page-header">
@@ -40,7 +42,8 @@ export default function MemoizationReview() {
                 <h2>The test had been completed!</h2>
                 <div></div>
             </div>
-            <MemoizationReviewScoreboard scoreList={scoreList} />
+
+            <MemoizationReviewScoreboard scoreList={scoreList} isLoading={isLoading}/>
             <Button
                 style={{padding: '25px 15px', width: '250px', margin: '0 auto', marginTop: 20}}
                 onClick={() => navigate('/dashboard', {replace: true})}

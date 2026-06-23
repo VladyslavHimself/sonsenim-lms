@@ -1,4 +1,4 @@
-import {CardConfigurationBody, UpdateCurveConfigurationBody} from "@sonsenim/contracts";
+import {CardConfigurationBody, ImportCardsConfigurationBody, UpdateCurveConfigurationBody} from "@sonsenim/contracts";
 import {RESOURCE_SERVER_URL} from "@/constants/resource.ts";
 import {axiosInstances} from "@/api/axiosInstances.ts";
 
@@ -15,6 +15,10 @@ export type Card = {
 const CardsApi = {
     addCardToDeck(deckId: number, newCardConfiguration: CardConfigurationBody) {
         return axiosInstances.post(`${RESOURCE_SERVER_URL}/api/cards/${deckId}`, newCardConfiguration);
+    },
+
+    importCardsToDeck(deckId: string, cards: ImportCardsConfigurationBody) {
+        return axiosInstances.post(`${RESOURCE_SERVER_URL}/api/cards/${deckId}/import`, cards);
     },
 
     getCardsToRepeatFromDeck(deckId: string) {

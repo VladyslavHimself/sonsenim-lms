@@ -23,6 +23,7 @@ export default function MemoizationPageProvider({ children }: PropsWithChildren)
     const { deck } = useDeck(deckId!);
     const { currentCard,
         dueCards,
+        isDueCardsLoading,
         setDueCards,
         resolvedCards,
         setResolvedCards,
@@ -59,6 +60,7 @@ export default function MemoizationPageProvider({ children }: PropsWithChildren)
         <MemoizationPageStateContext.Provider value={{
             deck,
             dueCards,
+            isDueCardsLoading,
             currentCard,
             currentCardFlowStage,
             currentTestStage,

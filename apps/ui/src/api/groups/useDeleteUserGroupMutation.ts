@@ -1,11 +1,12 @@
 import {useMutation} from "@tanstack/react-query";
 import {useToast} from "@/components/ui/use-toast.ts";
 import {GroupsApi} from "@/api";
+import {getAsyncStatus} from "@/api/getAsyncStatusFn.ts";
 
 
 export function useDeleteUserGroupMutation(callback: Function) {
     const { toast } = useToast();
-    const { mutate: deleteUserGroup } = useMutation({
+    const { mutate: deleteUserGroup, isError, isIdle, isSuccess, isPending } = useMutation({
         mutationKey: ['delete-user-group'],
         mutationFn: (groupId: number) => GroupsApi.deleteUserGroup(groupId),
         onSuccess: (data, variables, context) => {
@@ -19,5 +20,7 @@ export function useDeleteUserGroupMutation(callback: Function) {
             })
     });
 
-    return { deleteUserGroup };
+    const asyncStatus = getAsyncStatus(isIdle, isPending, isError, isSuccess)
+
+    return { deleteUserGroup, asyncStatus};
 }

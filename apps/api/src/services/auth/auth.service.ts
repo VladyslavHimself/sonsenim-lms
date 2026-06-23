@@ -25,7 +25,8 @@ export default function createAuthService(deps: {
         const user = await userDAO.findByUsername(username);
         if (!user.length) throw new AuthError("User not found", 404);
         const isPasswordValid = await encryptionService.verifyPassword(password, user[0].password)
-        if (!isPasswordValid) throw new AuthError("Invalid password", 401);
+        // TODO: If status 401 - can't receive AxiosError; Investigate
+        if (!isPasswordValid) throw new AuthError("Invalid password");
 
         const refreshToken = generateRefreshToken();
         const tokenHash = await sha256(refreshToken);

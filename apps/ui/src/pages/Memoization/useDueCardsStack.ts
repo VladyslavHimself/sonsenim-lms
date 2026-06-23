@@ -9,45 +9,48 @@ import {CardChoiceFlowResolveType} from "@/pages/Memoization/memoizationPage.typ
 
 export default function useDueCardsStack() {
     const [cardsSnapshot, setCardsSnapshot] = useState<Card[]>([]);
-    const { deckId } = useParams();
+    const {deckId} = useParams();
     const [dueCards, setDueCards] = useState<Card[]>([]);
     const [cardsTotal, setCardsTotal] = useState<number>(0);
     const [resolvedCards, setResolvedCards] = useState<Card[]>([]);
     const [cardsToRepeat, setCardsToRepeat] = useState<Card[]>([]);
-    useDueCards(deckId!, (data: Card[]) => {
+    const {isLoading} = useDueCards(deckId!, (data: Card[]) => {
         setCardsTotal(data.length);
         setDueCards(shuffleArray(data))
         setCardsSnapshot(data);
     });
     const currentCard = useMemo(() => dueCards[0], [dueCards]);
-    const { updateCardTimeCurve } = useUpdateCardTimeCurveMutation(() => {});
+    const {updateCardTimeCurve} = useUpdateCardTimeCurveMutation(() => {
+    });
 
-    function markCurrentCardAsCorrect({ isServerShouldUpdate }: CardChoiceFlowResolveType) {
+    function markCurrentCardAsCorrect({isServerShouldUpdate}: CardChoiceFlowResolveType) {
         if (isEmpty(dueCards)) return;
         setResolvedCards(prevState => [...prevState, currentCard]);
         isServerShouldUpdate && updateCardTimeCurve({
-                cardId: currentCard.cardId as unknown as string,
-                configuration: { isAnswerRight: true }
-            });
+            cardId: currentCard.cardId as unknown as string,
+            configuration: {isAnswerRight: true}
+        });
         setDueCards(prevCards => prevCards.slice(1));
     }
 
-    function markCurrentCardAsFailed({ isServerShouldUpdate }: CardChoiceFlowResolveType) {
+    function markCurrentCardAsFailed({isServerShouldUpdate}: CardChoiceFlowResolveType) {
         if (isEmpty(dueCards)) return;
         setResolvedCards(prevState => [...prevState, currentCard]);
         setCardsToRepeat(prevState => [...prevState, currentCard]);
         isServerShouldUpdate && updateCardTimeCurve({
             cardId: currentCard.cardId as unknown as string,
-            configuration: { isAnswerRight: false }
+            configuration: {isAnswerRight: false}
         });
         setDueCards(prevCards => prevCards.slice(1));
     }
 
 
     return {
+
         currentCard,
         cardsSnapshot,
         cardsTotal,
+        isDueCardsLoading: isLoading,
         dueCards,
         resolvedCards,
         cardsToRepeat,

@@ -7,7 +7,8 @@ import {deckMapper} from "../mappers/deck.mapper";
 import {Card} from "../models/domain/Card.model";
 import {
     CardConfigurationBody,
-    CardConfigurationBodySchema, UpdateCurveConfigurationBody,
+    CardConfigurationBodySchema,
+    ImportCardsConfigurationBody, ImportCardsConfigurationBodySchema, UpdateCurveConfigurationBody,
     UpdateCurveConfigurationBodySchema
 } from "@sonsenim/contracts";
 import {createCardsDAO} from "../models/dao/cards.dao";
@@ -69,6 +70,15 @@ export const cardsRoute = new Elysia({
         return newCard;
     }, {
         body: CardConfigurationBodySchema
+    })
+
+    .post ('/:deckId/import', async ({params, set, body, cardsService}) => {
+        const unwrappedBody = await unwrapBody<ImportCardsConfigurationBody>(body);
+        await cardsService.importCardsToDeck(params.deckId, unwrappedBody);
+        set.status = 200;
+        return;
+    }, {
+        body: ImportCardsConfigurationBodySchema
     })
 
     .delete('/:deckId/:cardId', async ({params, set, cardsService, progressionHistoryService}) => {

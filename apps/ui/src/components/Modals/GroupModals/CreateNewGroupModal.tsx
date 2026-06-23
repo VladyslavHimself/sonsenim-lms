@@ -15,7 +15,7 @@ type Props = {
 
 export default function CreateNewGroupModal({ modal }: Props) {
     const { refetch } = useUserGroupsInfo();
-    const { createUserGroup } = useCreateUserGroupMutation(() => {
+    const { createUserGroup, asyncStatus } = useCreateUserGroupMutation(() => {
         Modal.close(modal.id)
         refetch();
     });
@@ -43,7 +43,9 @@ export default function CreateNewGroupModal({ modal }: Props) {
             <ModalBoxConfirmationFooter
                 submitButtonProperties={{
                     label: 'Create',
-                    formId: 'create-group-form'
+                    formId: 'create-group-form',
+                    asyncStatus: asyncStatus,
+                    async: true
                 }}
             />
         </>

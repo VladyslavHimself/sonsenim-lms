@@ -2,6 +2,7 @@ import {useMutation} from "@tanstack/react-query";
 import {useToast} from "@/components/ui/use-toast.ts";
 import {GroupsApi} from "@/api";
 import {GroupConfigurationBody} from "@sonsenim/contracts";
+import {getAsyncStatus} from "@/api/getAsyncStatusFn.ts";
 
 type MutationParams = {
     groupId: number,
@@ -10,7 +11,7 @@ type MutationParams = {
 
 export function useUpdateUserGroupMutation(callback: Function) {
     const {toast} = useToast();
-    const {mutate: updateUserGroup} = useMutation({
+    const {mutate: updateUserGroup, isError, isIdle, isPending, isSuccess} = useMutation({
         mutationKey: ['update-user-group'],
         mutationFn: ({
                          groupId,
@@ -27,5 +28,7 @@ export function useUpdateUserGroupMutation(callback: Function) {
             })
     });
 
-    return {updateUserGroup};
+    const asyncStatus = getAsyncStatus(isIdle, isPending, isError, isSuccess);
+
+    return {updateUserGroup, asyncStatus};
 }

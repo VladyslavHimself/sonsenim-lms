@@ -4,6 +4,7 @@ export * from './reqs/RegistrationUserBody.schema';
 export * from './reqs/UpdateCurveConfigurationBody.schema';
 export * from './reqs/DeckConfigurationBody.schema';
 export * from './reqs/CardConfigurationBody.schema';
+export * from './reqs/ImportCardsConfigurationBody.schema'
 
 // resps
 export * from './resp/GroupResponse.schema';

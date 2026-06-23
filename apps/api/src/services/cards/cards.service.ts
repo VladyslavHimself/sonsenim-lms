@@ -2,7 +2,7 @@ import cardsRepository from "../../repositories/cards.repository";
 import {Card} from "../../models/domain/Card.model";
 import {PACE_REPETITION_INTERVAL, PACE_REPETITION_INTERVAL_MIN} from "../../helpers/paceRepetitionMatrix";
 import {convertIntervalToDate, decreaseInterval, increaseInterval} from "./cards.helpers";
-import {CardConfigurationBody, UpdateCurveConfigurationBody} from "@sonsenim/contracts";
+import {CardConfigurationBody, ImportCardsConfigurationBody, UpdateCurveConfigurationBody} from "@sonsenim/contracts";
 
 export default function createCardsService(deps: {
     cardsRepository: ReturnType<typeof cardsRepository>
@@ -14,6 +14,10 @@ export default function createCardsService(deps: {
 
     async function addNewCardToDeck(deckId: string, cardConfiguration: CardConfigurationBody) {
         return cardsRepository.addNewCardToDeck(deckId, cardConfiguration);
+    }
+
+    async function importCardsToDeck(deckId: string, cards: ImportCardsConfigurationBody) {
+        return cardsRepository.addNewCardsToDeck(deckId, cards);
     }
 
     async function deleteCard(deckId: string, cardId: string) {
@@ -51,6 +55,7 @@ export default function createCardsService(deps: {
         getCardsFromDeck,
         getDueCards,
         addNewCardToDeck,
+        importCardsToDeck,
         deleteCard,
         updateCard,
         updateTimeCurveForCard,
