@@ -27,11 +27,17 @@ const TAB = '\t';
 const SEMICOLON = ';';
 const NEW_LINE = '\n';
 
+const exportCardsConfiguration = z.object({
+    cardInnerSeparator: z.string().min(1),
+    cardOuterSeparator: z.string().min(1),
+    objectToExport: z.string().min(1).optional()
+});
+
 export default function ExportCardsModal({deckId}: Props) {
     const {deckCards} = useCards(deckId);
 
-    const form = useForm<z.infer<typeof importCardsConfiguration>>({
-        resolver: zodResolver(importCardsConfiguration),
+    const form = useForm<z.infer<typeof exportCardsConfiguration>>({
+        resolver: zodResolver(exportCardsConfiguration),
         defaultValues: {
             cardInnerSeparator: COMMA,
             cardOuterSeparator: SEMICOLON
@@ -59,7 +65,7 @@ export default function ExportCardsModal({deckId}: Props) {
                 <Form {...form}>
                     <form id="export-cards-form" className="import-cards-modal"
                           onSubmit={form.handleSubmit(() => {
-                              form.setValue('objectToImport', formatCards(deckCards));
+                              form.setValue('objectToExport', formatCards(deckCards));
                           })}
                     >
                         <FormField form={form.control} defaultValue="comma-separator" name="cardInnerSeparator"
@@ -136,10 +142,10 @@ export default function ExportCardsModal({deckId}: Props) {
                         <Field>
                             <ModalFormFieldLabel label="Paste data into the form" isRequired/>
                             <Textarea
-                                value={form.getValues('objectToImport')}
+                                value={form.getValues('objectToExport')}
                                 id="importTextarea"
                                 onChange={(e) => {
-                                    form.setValue('objectToImport', e.target.value);
+                                    form.setValue('objectToExport', e.target.value);
                                 }}
                                 placeholder="Exported data will be here"
                                 style={{minHeight: '231px', maxHeight: '500px'}}
