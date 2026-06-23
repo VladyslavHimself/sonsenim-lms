@@ -24,10 +24,12 @@ export function ModesToggleGroup({defaultValues, form}: Props) {
                     Normal
                 </ToggleGroupItem>
                 <ToggleGroupItem className="modes-toggle-group-item" value="isModeReversed"
+                                 disabled
                                  aria-label="Toggle reversed mode">
                     Reversed
                 </ToggleGroupItem>
                 <ToggleGroupItem className="modes-toggle-group-item" value="isModeTyping"
+                                 disabled
                                  aria-label="Toggle typing mode">
                     Typing
                 </ToggleGroupItem>
