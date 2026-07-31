@@ -6,7 +6,6 @@ import useCards from "@/api/cards/useCards.ts";
 import {useMemo} from "react";
 import {Card} from "@/api/cards/cards.ts";
 import MemoizationReviewScoreboard from "@/components/MemoizationReviewScoreboard/MemoizationReviewScoreboard.tsx";
-import {Spinner} from "@/components/ui/spinner.tsx";
 
 export type CardComparisonType = {
     definition: string;

@@ -6,13 +6,15 @@ import {
     useMemoizationPageState
 } from "@/pages/Memoization/MemoizationPageProvider.tsx";
 import {IS_REGULAR_TEST} from "@/pages/Memoization/memoizationPage.constants.ts";
+import {navigateBack} from "@/lib/navigateBack.function.ts";
 
 export default function MemoizationPageHeader() {
     const navigate = useNavigate();
-    const { deck, currentTestStage } = useMemoizationPageState();
-    const location = useNavigate();
+    const { deck, currentTestStage, isPracticeMode } = useMemoizationPageState();
 
-    const headerTitle = currentTestStage === IS_REGULAR_TEST ? deck?.deckName : "Error Correction";
+    const headerTitle = currentTestStage === IS_REGULAR_TEST
+        ? `${deck?.name}${isPracticeMode ? ' · Practice' : ''}`
+        : "Error Correction";
 
     return (
         <div className="memoization-page-header">
@@ -21,16 +23,7 @@ export default function MemoizationPageHeader() {
                 <House size={25} />
             </Button>
             <h2>{ headerTitle }</h2>
-            <Button onClick={ifGetBackToPage}>Finish</Button>
+            <Button onClick={() => navigateBack(navigate)}>Finish</Button>
         </div>
     );
-    
-    function ifGetBackToPage() {
-        if (window.history.length > 2) {
-            location(-1);
-        } else {
-            navigate('/dashboard');
-        }
-    }
-
 }
