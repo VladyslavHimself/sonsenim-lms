@@ -1,5 +1,5 @@
 import React, {PropsWithChildren, useEffect, useState} from "react";
-import {useNavigate, useParams} from "react-router-dom";
+import {useNavigate, useParams, useSearchParams} from "react-router-dom";
 import useDeck from "@/api/decks/useDeck.ts";
 import useDueCardsStack from "@/pages/Memoization/useDueCardsStack.ts";
 import {
@@ -9,6 +9,7 @@ import {
 } from "@/pages/Memoization/memoizationPage.constants.ts";
 import {MemoizationPageStage, MemoizationProgressStage} from "@/pages/Memoization/memoizationPage.types.ts";
 import {isEmpty} from "lodash";
+import {navigateBack} from "@/lib/navigateBack.function.ts";
 
 
 // TODO: Add types later
@@ -19,7 +20,11 @@ export default function MemoizationPageProvider({ children }: PropsWithChildren)
     const [currentCardFlowStage, setCurrentCardFlowStage] = useState<MemoizationPageStage>(IS_PENDING_ANSWER);
     const [currentTestStage, setCurrentTestStage] = useState<MemoizationProgressStage>(IS_REGULAR_TEST);
     const { deckId } = useParams();
+    const [searchParams] = useSearchParams();
     const navigate = useNavigate();
+
+    const isPracticeMode = searchParams.get('practice') === 'true';
+
     const { deck } = useDeck(deckId!);
     const { currentCard,
         dueCards,
@@ -33,8 +38,8 @@ export default function MemoizationPageProvider({ children }: PropsWithChildren)
         setCardsToRepeat,
         markCurrentCardAsCorrect,
         markCurrentCardAsFailed,
-        cardsSnapshot
-    } = useDueCardsStack();
+        sessionCardsSnapshot
+    } = useDueCardsStack(isPracticeMode);
 
     useEffect(() => {
         if (isEmpty(dueCards) && !isEmpty(cardsToRepeat)) {
@@ -48,13 +53,28 @@ export default function MemoizationPageProvider({ children }: PropsWithChildren)
 
     useEffect(() => {
         if (isEmpty(dueCards) && isEmpty(cardsToRepeat) && cardsTotal !== 0) {
+            if (isPracticeMode) {
+                navigateBack(navigate);
+                return;
+            }
             // TODO: hardcoded. Replace card comparison with payload data instead of additional request
             setTimeout(() => {
-                navigate('/memoization/review', { replace: true, state: { cardsSnapshot, deckId }});
+                navigate('/memoization/review', { replace: true, state: { cardsSnapshot: sessionCardsSnapshot, deckId }});
             }, 200)
-            // navigate('/memoization/review', { replace: true, state: { cardsSnapshot, deckId }});
         }
-    }, [cardsSnapshot, cardsToRepeat, cardsTotal, deckId, dueCards, navigate]);
+    }, [sessionCardsSnapshot, cardsToRepeat, cardsTotal, deckId, dueCards, isPracticeMode, navigate]);
+
+    function finishSession() {
+        if (currentTestStage === IS_ERROR_CORRECTION || isEmpty(cardsToRepeat)) {
+            navigateBack(navigate);
+            return;
+        }
+        setCurrentTestStage(IS_ERROR_CORRECTION);
+        setDueCards([...cardsToRepeat]);
+        setCardsTotal(cardsToRepeat.length);
+        setResolvedCards([]);
+        setCardsToRepeat([]);
+    }
 
     return (
         <MemoizationPageStateContext.Provider value={{
@@ -65,12 +85,14 @@ export default function MemoizationPageProvider({ children }: PropsWithChildren)
             currentCardFlowStage,
             currentTestStage,
             resolvedCards,
-            cardsTotal
+            cardsTotal,
+            isPracticeMode
         }}>
             <MemoizationPageActionsContext.Provider value={{
                 markCurrentCardAsCorrect,
                 markCurrentCardAsFailed,
-                setCurrentCardFlowStage
+                setCurrentCardFlowStage,
+                finishSession
             }}>
                 {children}
             </MemoizationPageActionsContext.Provider>

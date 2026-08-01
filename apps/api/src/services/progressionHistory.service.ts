@@ -2,6 +2,7 @@ import createProgressionHistoryRepository from "../repositories/progressionHisto
 import dayjs from "dayjs";
 import {ProgressionHistoryEntity} from "../models/domain/ProgressionHistoryEntityModel";
 import createCardsRepository from "../repositories/cards.repository";
+import createGroupsRepository from "../repositories/groups.repository";
 
 type ProgressionHistoryMap = {
     [key: string]: ProgressionHistoryEntity
@@ -9,11 +10,14 @@ type ProgressionHistoryMap = {
 
 const createProgressionHistoryService = function (deps: {
     progressionHistoryRepository: ReturnType<typeof createProgressionHistoryRepository>,
-    cardsRepository: ReturnType<typeof createCardsRepository>
+    cardsRepository: ReturnType<typeof createCardsRepository>,
+    groupsRepository: ReturnType<typeof createGroupsRepository>
 }) {
-    const {progressionHistoryRepository, cardsRepository} = deps;
+    const {progressionHistoryRepository, cardsRepository, groupsRepository} = deps;
 
-    async function getGroupCardsIntervalHistory(groupId: string) {
+    async function getGroupCardsIntervalHistory(userId: string, groupId: string) {
+        await groupsRepository.getByIdAndUserId(groupId, userId);
+
         const startDay = dayjs().subtract(7, 'day').startOf('day');
         const endDay = dayjs().add(1, 'day').startOf('day').toDate();
 

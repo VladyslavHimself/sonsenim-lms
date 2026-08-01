@@ -7,7 +7,7 @@
     justify-content: center;
 
     border-radius: 12px;
-    background-color: #EDEDED;
+    background-color: hsl(var(--surface-muted));
     padding: 0 15px;
 
 
@@ -27,7 +27,7 @@
     }
 
     .content-card-information {
-        color: #F18C29;
+        color: hsl(var(--brand));
         font-family: "Gilroy Medium", sans-serif;
         font-size: 24px;
     }

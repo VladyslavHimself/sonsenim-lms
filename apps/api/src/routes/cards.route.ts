@@ -18,6 +18,8 @@ import authHook from "../hooks/authHook";
 import createProgressionHistoryRepository from "../repositories/progressionHistory.repository";
 import createProgressionHistoryService from "../services/progressionHistory.service";
 import {createProgressionHistoryDAO} from "../models/dao/progressionHistory.dao";
+import createGroupsRepository from "../repositories/groups.repository";
+import {createGroupsDAO} from "../models/dao/Groups.dao";
 
 export const cardsRoute = new Elysia({
     name: 'cardsRoute',
@@ -44,9 +46,15 @@ export const cardsRoute = new Elysia({
             progressionHistoryDao: ProgressionHistoryDAO
         });
 
+        const GroupsRepository = createGroupsRepository({
+            groupsDAO: createGroupsDAO(db),
+            db
+        });
+
         const ProgressionHistoryService = createProgressionHistoryService({
             progressionHistoryRepository: ProgressionHistoryRepository,
-            cardsRepository: CardsRepository
+            cardsRepository: CardsRepository,
+            groupsRepository: GroupsRepository
         })
 
         const CardsService = createCardsService({
@@ -58,56 +66,58 @@ export const cardsRoute = new Elysia({
             progressionHistoryService: ProgressionHistoryService
         }
     })
-    .get('/:deckId', async ({params, cardsService}) => {
-        const cards = await cardsService.getCardsFromDeck(params.deckId);
+    .get('/:deckId', async ({params, user, cardsService}) => {
+        const cards = await cardsService.getCardsFromDeck(user.id, params.deckId);
         return cardResponseDtoMapper.toDTOList(cards);
     })
 
-    .post('/:deckId', async ({params, body, cardsService, progressionHistoryService}) => {
+    .post('/:deckId', async ({params, body, user, cardsService, progressionHistoryService}) => {
         const unwrappedBody = await unwrapBody<CardConfigurationBody>(body);
-        const newCard = await cardsService.addNewCardToDeck(params.deckId, unwrappedBody);
+        const newCard = await cardsService.addNewCardToDeck(user.id, params.deckId, unwrappedBody);
         await progressionHistoryService.updateUserCardsHistory(newCard.id);
         return newCard;
     }, {
         body: CardConfigurationBodySchema
     })
 
-    .post ('/:deckId/import', async ({params, set, body, cardsService}) => {
+    .post ('/:deckId/import', async ({params, set, body, user, cardsService}) => {
         const unwrappedBody = await unwrapBody<ImportCardsConfigurationBody>(body);
-        await cardsService.importCardsToDeck(params.deckId, unwrappedBody);
+        await cardsService.importCardsToDeck(user.id, params.deckId, unwrappedBody);
         set.status = 200;
         return;
     }, {
         body: ImportCardsConfigurationBodySchema
     })
 
-    .delete('/:deckId/:cardId', async ({params, set, cardsService, progressionHistoryService}) => {
+    // History must be recorded while the card row still exists (it resolves the card's group).
+    .delete('/:deckId/:cardId', async ({params, set, user, cardsService, progressionHistoryService}) => {
+        await cardsService.getCard(user.id, params.cardId);
         await progressionHistoryService.updateUserCardsHistory(params.cardId);
-        await cardsService.deleteCard(params.deckId, params.cardId);
+        await cardsService.deleteCard(user.id, params.deckId, params.cardId);
         set.status = 204;
         return;
     })
 
     // TODO: Refactor logic once backend will be rewritten
-    .put('/:deckId/:cardId', async ({params, body, cardsService}) => {
+    .put('/:deckId/:cardId', async ({params, body, user, cardsService}) => {
         const unwrappedBody = await unwrapBody<CardConfigurationBody>(body);
-        const updatedCard: Card = await cardsService.updateCard(params.deckId, params.cardId, unwrappedBody);
+        const updatedCard: Card = await cardsService.updateCard(user.id, params.deckId, params.cardId, unwrappedBody);
         return cardResponseDtoMapper.toDTO(updatedCard);
 
     }, {
         body: CardConfigurationBodySchema
     })
 
-    .patch('/:cardId/update-curve', async ({params, body, cardsService, progressionHistoryService}) => {
+    .patch('/:cardId/update-curve', async ({params, body, user, cardsService, progressionHistoryService}) => {
         const unwrappedBody = await unwrapBody<UpdateCurveConfigurationBody>(body);
-        const newTimeCurve = await cardsService.updateTimeCurveForCard(params.cardId, unwrappedBody)
+        const newTimeCurve = await cardsService.updateTimeCurveForCard(user.id, params.cardId, unwrappedBody)
         await progressionHistoryService.updateUserCardsHistory(params.cardId);
         return newTimeCurve;
     }, {
         body: UpdateCurveConfigurationBodySchema
     })
 
-    .get('/:deckId/to-repeat', async ({params, cardsService}) => {
-        const cards: Card[] = await cardsService.getDueCards(params.deckId)
+    .get('/:deckId/to-repeat', async ({params, user, cardsService}) => {
+        const cards: Card[] = await cardsService.getDueCards(user.id, params.deckId)
         return cardResponseDtoMapper.toDTOList(cards);
     })

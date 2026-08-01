@@ -42,7 +42,7 @@ export function DataTable<TData, TValue>({
     })
 
     return (
-        <div className="rounded-md border bg-white">
+        <div className="rounded-md border bg-surface-raised">
             <Table>
                 <TableHeader style={{ height: '80px'}}>
                     {table.getHeaderGroups().map((headerGroup) => (

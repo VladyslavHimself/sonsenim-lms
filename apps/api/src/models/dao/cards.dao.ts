@@ -27,10 +27,13 @@ export const createCardsDAO = (db: any) => ({
                              ${definition}, ${prePersistIntervalStrengthValue}) RETURNING *`;
     },
 
-    findById: async (cardId: string) => {
-        const rows = await db`SELECT *
-                                 FROM cards
-                                 WHERE id = ${cardId}`;
+    findByIdForUser: async (cardId: string, userId: string) => {
+        const rows = await db`SELECT c.*
+                                 FROM cards c
+                                          JOIN decks d ON d.id = c.deck_id
+                                          JOIN groups g ON g.id = d.group_id
+                                 WHERE c.id = ${cardId}
+                                   AND g.local_user_id = ${userId}`;
         return filterRawSqlData(rows)[0] ?? null;
     },
 

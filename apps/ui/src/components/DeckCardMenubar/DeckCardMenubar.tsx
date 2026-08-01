@@ -19,13 +19,13 @@ type Props = {
 
 
 export default function DeckCardMenubar({ modal, deckProperties, refetchDecks, groupId, navigate }: Props) {
-  const { dueCardsInDeck } = deckProperties;
+  const { dueCardsInDeck, cardsInDeckTotal } = deckProperties;
+  const isPracticeFallback = !+dueCardsInDeck && !!+cardsInDeckTotal;
 
   return (
     <div className="deck-menubar-container">
-      <Button disabled={!+dueCardsInDeck} variant="outline" className="menubar-list-item"
-        onClick={openMemoizationPage}><Brain /> Start
-        Learning</Button>
+      <Button disabled={!+cardsInDeckTotal} variant="outline" className="menubar-list-item"
+        onClick={openMemoizationPage}><Brain /> {isPracticeFallback ? 'Practice' : 'Start Learning'}</Button>
       <Button variant="outline" className="menubar-list-item" onClick={onAddNewCardHandle}><PlusIcon /> Add new
         card</Button>
       <Button variant="outline" className="menubar-list-item" onClick={openCardListPage}><List />Card List</Button>
@@ -54,7 +54,8 @@ export default function DeckCardMenubar({ modal, deckProperties, refetchDecks, g
   }
 
   function openMemoizationPage() {
-    navigate(`/memoization/${deckProperties.id}`);
+    const query = isPracticeFallback ? '?practice=true' : '';
+    navigate(`/memoization/${deckProperties.id}${query}`);
     modal.close(modal.id);
   }
 

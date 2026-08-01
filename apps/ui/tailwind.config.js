@@ -51,6 +51,35 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        surface: {
+          page: "hsl(var(--surface-page))",
+          raised: "hsl(var(--surface-raised))",
+          subtle: "hsl(var(--surface-subtle))",
+          muted: "hsl(var(--surface-muted))",
+          "muted-hover": "hsl(var(--surface-muted-hover))",
+        },
+        brand: {
+          DEFAULT: "hsl(var(--brand))",
+          strong: "hsl(var(--brand-strong))",
+          foreground: "hsl(var(--brand-foreground))",
+        },
+        danger: {
+          DEFAULT: "hsl(var(--danger))",
+          hover: "hsl(var(--danger-hover))",
+          strong: "hsl(var(--danger-strong))",
+        },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          hover: "hsl(var(--success-hover))",
+          strong: "hsl(var(--success-strong))",
+        },
+        warning: "hsl(var(--warning))",
+        track: "hsl(var(--track))",
+        content: {
+          muted: "hsl(var(--text-muted))",
+          subtle: "hsl(var(--text-subtle))",
+          placeholder: "hsl(var(--text-placeholder))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

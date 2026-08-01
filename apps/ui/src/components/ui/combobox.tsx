@@ -51,7 +51,7 @@ export function Combobox({selectionList, selectedValue, onChangeValue, placehold
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
-                    className="w-[100%] h-[60px] justify-between bg-[#E8E8E8] hover:bg-[#ECECEC]"
+                    className="w-[100%] h-[60px] justify-between bg-surface-muted hover:bg-surface-muted-hover"
                 >
                     {selectedValue.value
                         ? selectionList.find((item) => item.value === selectedValue.value)?.label

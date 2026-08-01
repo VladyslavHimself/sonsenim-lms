@@ -5,16 +5,16 @@
 
   > span {
     font-size: 18px;
-    color: #868686;
+    color: hsl(var(--text-subtle));
     margin-bottom: 10px;
   }
 
   .modes-toggle-group-item {
     border: none;
-    background-color: rgba(219, 219, 219, 0.24);
+    background-color: hsl(var(--surface-muted));
 
     &[data-state="on"] {
-      background-color: rgba(255, 144, 38, 0.27);
+      background-color: hsl(var(--brand) / 0.27);
     }
   }
 }

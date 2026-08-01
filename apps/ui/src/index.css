@@ -4,14 +4,15 @@
 
 @layer base {
   :root {
+    /* shadcn base tokens */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 30 88% 56%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
     --muted: 210 40% 96.1%;
@@ -22,40 +23,108 @@
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --ring: 30 88% 56%;
     --radius: 0.5rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+
+    /* Surfaces — page is the app backdrop, raised sits above it,
+       muted is for inset controls/cards. */
+    --surface-page: 0 0% 96%;
+    --surface-raised: 0 0% 98%;
+    --surface-subtle: 0 0% 96.5%;
+    --surface-muted: 0 0% 92.5%;
+    --surface-muted-hover: 0 0% 88%;
+
+    /* Text ramp, lightest last */
+    --text-muted: 0 0% 39%;
+    --text-subtle: 0 0% 55%;
+    --text-placeholder: 0 0% 73%;
+
+    /* Brand */
+    --brand: 30 88% 56%;
+    --brand-strong: 21 80% 53%;
+    --brand-foreground: 0 0% 100%;
+
+    /* Status */
+    --danger: 0 100% 73%;
+    --danger-hover: 0 70% 64%;
+    --danger-strong: 0 81% 53%;
+    --success: 130 65% 73%;
+    --success-hover: 130 52% 64%;
+    --success-strong: 95 66% 38%;
+    --warning: 50 100% 44%;
+    --level-high: 283 100% 42%;
+    --neutral-info: 199 30% 58%;
+
+    /* Misc */
+    --track: 0 0% 85%;
+    --overlay: 0 0% 0%;
+    --overlay-opacity: 0.2;
+
+    /* Chart series */
+    --chart-1: 97 62% 51%;
+    --chart-2: 0 81% 53%;
+    --chart-3: 50 100% 44%;
+    --chart-4: 283 100% 42%;
+    --chart-grid: 0 0% 0%;
+    --chart-grid-opacity: 0.1;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    /* shadcn base tokens */
+    --background: 222 18% 10%;
+    --foreground: 210 20% 94%;
+    --card: 222 16% 13%;
+    --card-foreground: 210 20% 94%;
+    --popover: 222 16% 13%;
+    --popover-foreground: 210 20% 94%;
+    --primary: 30 90% 60%;
+    --primary-foreground: 222 25% 8%;
+    --secondary: 222 15% 17%;
+    --secondary-foreground: 210 20% 94%;
+    --muted: 222 15% 17%;
+    --muted-foreground: 220 9% 65%;
+    --accent: 222 15% 17%;
+    --accent-foreground: 210 20% 94%;
+    --destructive: 0 65% 52%;
+    --destructive-foreground: 210 20% 96%;
+    --border: 222 14% 22%;
+    --input: 222 14% 22%;
+    --ring: 30 90% 60%;
+
+    --surface-page: 222 18% 10%;
+    --surface-raised: 222 16% 13%;
+    --surface-subtle: 222 16% 15%;
+    --surface-muted: 222 15% 18%;
+    --surface-muted-hover: 222 14% 23%;
+
+    --text-muted: 220 9% 72%;
+    --text-subtle: 220 8% 58%;
+    --text-placeholder: 220 7% 45%;
+
+    --brand: 30 90% 60%;
+    --brand-strong: 21 85% 58%;
+    --brand-foreground: 222 25% 8%;
+
+    --danger: 0 70% 62%;
+    --danger-hover: 0 65% 55%;
+    --danger-strong: 0 75% 60%;
+    --success: 130 45% 55%;
+    --success-hover: 130 45% 48%;
+    --success-strong: 95 50% 50%;
+    --warning: 50 90% 55%;
+    --level-high: 283 85% 65%;
+    --neutral-info: 199 32% 52%;
+
+    --track: 222 12% 28%;
+    --overlay: 0 0% 0%;
+    --overlay-opacity: 0.6;
+
+    --chart-1: 97 55% 55%;
+    --chart-2: 0 75% 62%;
+    --chart-3: 50 90% 55%;
+    --chart-4: 283 85% 68%;
+    --chart-grid: 0 0% 100%;
+    --chart-grid-opacity: 0.12;
   }
 }
 
@@ -74,7 +143,12 @@
 
   display: flex;
 
-  background-color: #f4f4f4;
+  background-color: hsl(var(--surface-page));
+  color: hsl(var(--foreground));
+}
+
+.dark .icon-adaptive {
+  filter: invert(1);
 }
 
 @media (max-width: 600px) {

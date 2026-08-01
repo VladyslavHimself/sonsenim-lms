@@ -20,6 +20,7 @@ import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 import Profile from "@/pages/Profile/Profile.tsx";
 import Navbar from "@/pages/Navigation/Navbar.tsx";
 import ModalBoxProvider from "@/ModalBox/ModalBoxProvider.tsx";
+import {ThemeProvider} from "@/theme/ThemeProvider.tsx";
 
 const router = createBrowserRouter([
     {
@@ -88,14 +89,16 @@ const queryClient = new QueryClient()
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
         <QueryClientProvider client={queryClient}>
-            <AuthProvider>
-                <ModalBoxProvider>
-                    <Toaster/>
-                    <div className="app-container">
-                        <RouterProvider router={router}/>
-                    </div>
-                </ModalBoxProvider>
-            </AuthProvider>
+            <ThemeProvider>
+                <AuthProvider>
+                    <ModalBoxProvider>
+                        <Toaster/>
+                        <div className="app-container">
+                            <RouterProvider router={router}/>
+                        </div>
+                    </ModalBoxProvider>
+                </AuthProvider>
+            </ThemeProvider>
             <ReactQueryDevtools initialIsOpen={false}/>
         </QueryClientProvider>
     </React.StrictMode>,

@@ -36,8 +36,8 @@ export const decksRoute = new Elysia({
             decksService: DecksService,
         }
     })
-    .get('/:groupId', async ({params, decksService}) => {
-        const decks = await decksService.getDecksFromGroup(params.groupId);
+    .get('/:groupId', async ({params, user, decksService}) => {
+        const decks = await decksService.getDecksFromGroup(user.id, params.groupId);
         return decks.map(({groupId, ...rest}) =>
             ({...rest}));
     })
@@ -47,20 +47,20 @@ export const decksRoute = new Elysia({
     }, {
         body: DeckConfigurationBodySchema
     })
-    .put('/:deckId', async ({params, body, decksService}
+    .put('/:deckId', async ({params, body, user, decksService}
     ) => {
         const unwrappedBody = await unwrapBody<DeckConfigurationBody>(body);
-        return decksService.updateDeck(params.deckId, unwrappedBody);
+        return decksService.updateDeck(user.id, params.deckId, unwrappedBody);
     }, {
         body: DeckConfigurationBodySchema
     })
-    .get('/id/:deckId', async ({params, decksService}) => {
-        const deck = await decksService.getDeck(params.deckId);
+    .get('/id/:deckId', async ({params, user, decksService}) => {
+        const deck = await decksService.getDeck(user.id, params.deckId);
         return deckResponseDtoMapper.toDTO(deck);
     })
-    .delete('/:deckId', async ({params, decksService}) => {
-        return decksService.deleteDeck(params.deckId);
+    .delete('/:deckId', async ({params, user, decksService}) => {
+        return decksService.deleteDeck(user.id, params.deckId);
     })
-    .get('/stats/:deckId', async ({user, params, decksService}) => {
-        return decksService.getDecksStats(user.id, params.deckId);
+    .get('/stats/:groupId', async ({user, params, decksService}) => {
+        return decksService.getDecksStats(user.id, params.groupId);
     })

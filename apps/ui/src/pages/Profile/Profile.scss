@@ -27,7 +27,7 @@
     .profile-page-group-section {
         max-width: 638px;
         width: 100%;
-        background-color: #EDEDED;
+        background-color: hsl(var(--surface-muted));
         border-radius: 13px;
         margin-top: 20px;
 
@@ -63,6 +63,28 @@
                 font-family: "Gilroy Regular", sans-serif;
                 font-size: 18px;
                 padding-bottom: 5px;
+            }
+
+            .profile-page-theme-toggle {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+
+                padding: 12px 20px;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+
+                background-color: hsl(var(--surface-raised));
+                color: inherit;
+                font-family: "Gilroy Medium", sans-serif;
+                font-size: 16px;
+
+                transition: background-color .2s ease;
+
+                &:hover {
+                    background-color: hsl(var(--surface-muted-hover));
+                }
             }
 
 

@@ -6,7 +6,7 @@
     width: 350px;
     height: 75px;
 
-    background-color: #EFEFEF;
+    background-color: hsl(var(--surface-raised));
     border-radius: 19px;
 
     z-index: 999;
@@ -26,9 +26,9 @@
         border-radius: 9px;
 
         &.is-action-button {
-            background-color: #E86F26;
+            background-color: hsl(var(--brand-strong));
             border-radius: 100%;
-            color: #fff;
+            color: hsl(var(--brand-foreground));
             cursor: pointer;
         }
 
@@ -38,12 +38,12 @@
         }
 
         &.mobile-navbar-item-active-tab {
-            background-color: #EAEAEA;
+            background-color: hsl(var(--surface-muted));
 
             svg {
                 width: 30px;
                 height: 30px;
-                color: #E86F26;
+                color: hsl(var(--brand-strong));
             }
         }
     }

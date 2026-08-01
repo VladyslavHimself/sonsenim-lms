@@ -9,7 +9,7 @@
     align-items: center;
 
     border-radius: 13px;
-    background-color: #FBFBFB;
+    background-color: hsl(var(--surface-raised));
     margin: 0 auto;
 
     font-family: "Gilroy Medium", sans-serif;
@@ -25,7 +25,7 @@
     .memoization-card-flip-word {
         margin-top: 42px;
         font-size: 32px;
-        color: #636363;
+        color: hsl(var(--text-muted));
 
         @media screen and (max-width: 600px) {
             font-size: 24px;
@@ -34,7 +34,7 @@
 
     .memoization-card-description {
         width: 80%;
-        color: #636363;
+        color: hsl(var(--text-muted));
 
         margin-top: 25px;
         font-size: 24px;
