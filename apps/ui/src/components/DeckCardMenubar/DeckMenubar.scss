@@ -1,7 +1,7 @@
 
 .deck-menubar {
     width: 350px !important;
-    border: 5px solid white;
+    border: 5px solid hsl(var(--surface-raised));
     background-color: hsl(var(--surface-raised)) !important;
 
     .deck-menubar-container {
