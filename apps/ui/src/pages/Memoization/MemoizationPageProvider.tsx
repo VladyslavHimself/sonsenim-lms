@@ -38,7 +38,7 @@ export default function MemoizationPageProvider({ children }: PropsWithChildren)
         setCardsToRepeat,
         markCurrentCardAsCorrect,
         markCurrentCardAsFailed,
-        cardsSnapshot
+        sessionCardsSnapshot
     } = useDueCardsStack(isPracticeMode);
 
     useEffect(() => {
@@ -59,11 +59,22 @@ export default function MemoizationPageProvider({ children }: PropsWithChildren)
             }
             // TODO: hardcoded. Replace card comparison with payload data instead of additional request
             setTimeout(() => {
-                navigate('/memoization/review', { replace: true, state: { cardsSnapshot, deckId }});
+                navigate('/memoization/review', { replace: true, state: { cardsSnapshot: sessionCardsSnapshot, deckId }});
             }, 200)
-            // navigate('/memoization/review', { replace: true, state: { cardsSnapshot, deckId }});
         }
-    }, [cardsSnapshot, cardsToRepeat, cardsTotal, deckId, dueCards, isPracticeMode, navigate]);
+    }, [sessionCardsSnapshot, cardsToRepeat, cardsTotal, deckId, dueCards, isPracticeMode, navigate]);
+
+    function finishSession() {
+        if (currentTestStage === IS_ERROR_CORRECTION || isEmpty(cardsToRepeat)) {
+            navigateBack(navigate);
+            return;
+        }
+        setCurrentTestStage(IS_ERROR_CORRECTION);
+        setDueCards([...cardsToRepeat]);
+        setCardsTotal(cardsToRepeat.length);
+        setResolvedCards([]);
+        setCardsToRepeat([]);
+    }
 
     return (
         <MemoizationPageStateContext.Provider value={{
@@ -80,7 +91,8 @@ export default function MemoizationPageProvider({ children }: PropsWithChildren)
             <MemoizationPageActionsContext.Provider value={{
                 markCurrentCardAsCorrect,
                 markCurrentCardAsFailed,
-                setCurrentCardFlowStage
+                setCurrentCardFlowStage,
+                finishSession
             }}>
                 {children}
             </MemoizationPageActionsContext.Provider>

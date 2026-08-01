@@ -15,6 +15,7 @@ export default function useDueCardsStack(isPracticeMode: boolean = false) {
     const [cardsTotal, setCardsTotal] = useState<number>(0);
     const [resolvedCards, setResolvedCards] = useState<Card[]>([]);
     const [cardsToRepeat, setCardsToRepeat] = useState<Card[]>([]);
+    const [sessionCardsSnapshot, setSessionCardsSnapshot] = useState<Card[]>([]);
 
     const {isLoading: isDueCardsLoading} = useDueCards(deckId!, onCardsLoaded, !isPracticeMode);
     const {isLoading: isAllCardsLoading} = useCardsInDeck(deckId!, onCardsLoaded, isPracticeMode);
@@ -24,9 +25,16 @@ export default function useDueCardsStack(isPracticeMode: boolean = false) {
     const {updateCardTimeCurve} = useUpdateCardTimeCurveMutation(() => {
     });
 
+    function addToSessionCardsSnapshot(card: Card) {
+        setSessionCardsSnapshot(prevState =>
+            prevState.some(_card => _card.cardId === card.cardId) ? prevState : [...prevState, card]
+        );
+    }
+
     function markCurrentCardAsCorrect({isServerShouldUpdate}: CardChoiceFlowResolveType) {
         if (isEmpty(dueCards)) return;
         setResolvedCards(prevState => [...prevState, currentCard]);
+        addToSessionCardsSnapshot(currentCard);
         isServerShouldUpdate && !isPracticeMode && updateCardTimeCurve({
             cardId: currentCard.cardId as unknown as string,
             configuration: {isAnswerRight: true}
@@ -38,6 +46,7 @@ export default function useDueCardsStack(isPracticeMode: boolean = false) {
         if (isEmpty(dueCards)) return;
         setResolvedCards(prevState => [...prevState, currentCard]);
         setCardsToRepeat(prevState => [...prevState, currentCard]);
+        addToSessionCardsSnapshot(currentCard);
         isServerShouldUpdate && !isPracticeMode && updateCardTimeCurve({
             cardId: currentCard.cardId as unknown as string,
             configuration: {isAnswerRight: false}
@@ -61,6 +70,7 @@ export default function useDueCardsStack(isPracticeMode: boolean = false) {
         dueCards,
         resolvedCards,
         cardsToRepeat,
+        sessionCardsSnapshot,
         setDueCards,
         setCardsTotal,
         setResolvedCards,
