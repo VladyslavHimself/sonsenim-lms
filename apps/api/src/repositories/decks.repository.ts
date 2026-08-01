@@ -48,21 +48,22 @@ export default function createDecksRepository(deps: {
         return decksStatsMapper.toDecksStatsDTOList(filteredRows);
     }
 
-    async function findDeck(deckId: string): Promise<Deck> {
-        const foundDeck = await decksDAO.findById(deckId)
+    async function findDeckForUser(deckId: string, userId: string): Promise<Deck> {
+        const foundDeck = await decksDAO.findByIdForUser(deckId, userId)
         if (!foundDeck) throw new DecksException('Deck not found', 404);
         return deckMapper.toDTO(foundDeck);
     }
 
-    async function updateDeck(deckId: string, deckConfiguration: DeckConfigurationBody) {
-        return decksDAO.update(deckId, deckConfiguration);
+    async function updateDeckForUser(deckId: string, userId: string, deckConfiguration: DeckConfigurationBody) {
+        const updatedDeck = await decksDAO.updateForUser(deckId, userId, deckConfiguration);
+        if (!updatedDeck) throw new DecksException('Deck not found', 404);
+        return updatedDeck;
     }
 
-    async function deleteDeck(deckId: string) {
-        const foundDeck = await decksDAO.findById(deckId);
-        if (!foundDeck) throw new DecksException('Deck not found', 404);
-
-        return decksDAO.delete(deckId);
+    async function deleteDeckForUser(deckId: string, userId: string) {
+        const deletedDeck = await decksDAO.deleteForUser(deckId, userId);
+        if (!deletedDeck) throw new DecksException('Deck not found', 404);
+        return deletedDeck;
     }
 
     async function getAllUserDecksTotal(userId: string) {
@@ -78,9 +79,9 @@ export default function createDecksRepository(deps: {
         getGroupDecks,
         getGroupDecksWithCardsStatistics,
         addDeckToGroup,
-        findDeck,
-        updateDeck,
-        deleteDeck,
+        findDeckForUser,
+        updateDeckForUser,
+        deleteDeckForUser,
         countByGroupId,
         getAllUserDecksTotal
     };

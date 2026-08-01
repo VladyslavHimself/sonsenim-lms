@@ -59,7 +59,8 @@ export const progressionHistoryRoutes = new Elysia({
 
         const ProgressionHistoryService = createProgressionHistoryService({
             progressionHistoryRepository: ProgressionHistoryRepository,
-            cardsRepository: CardsRepository
+            cardsRepository: CardsRepository,
+            groupsRepository: GroupsRepository
         });
 
         return {
@@ -69,6 +70,6 @@ export const progressionHistoryRoutes = new Elysia({
             progressionHistoryService: ProgressionHistoryService
         };
     })
-    .get(`/:groupId`, async ({progressionHistoryService, params}) => {
-        return progressionHistoryService.getGroupCardsIntervalHistory(params.groupId);
+    .get(`/:groupId`, async ({progressionHistoryService, params, user}) => {
+        return progressionHistoryService.getGroupCardsIntervalHistory(user.id, params.groupId);
     })

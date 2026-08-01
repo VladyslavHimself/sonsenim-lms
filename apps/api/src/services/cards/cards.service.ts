@@ -8,33 +8,37 @@ export default function createCardsService(deps: {
     cardsRepository: ReturnType<typeof cardsRepository>
 }) {
     const { cardsRepository } = deps;
-    async function getCardsFromDeck(deckId: string) {
-        return cardsRepository.getCardsFromDeck(deckId);
+    async function getCardsFromDeck(userId: string, deckId: string) {
+        return cardsRepository.getCardsFromDeck(deckId, userId);
     }
 
-    async function addNewCardToDeck(deckId: string, cardConfiguration: CardConfigurationBody) {
-        return cardsRepository.addNewCardToDeck(deckId, cardConfiguration);
+    async function addNewCardToDeck(userId: string, deckId: string, cardConfiguration: CardConfigurationBody) {
+        return cardsRepository.addNewCardToDeck(deckId, userId, cardConfiguration);
     }
 
-    async function importCardsToDeck(deckId: string, cards: ImportCardsConfigurationBody) {
-        return cardsRepository.addNewCardsToDeck(deckId, cards);
+    async function importCardsToDeck(userId: string, deckId: string, cards: ImportCardsConfigurationBody) {
+        return cardsRepository.addNewCardsToDeck(deckId, userId, cards);
     }
 
-    async function deleteCard(deckId: string, cardId: string) {
-        return cardsRepository.deleteCard(deckId, cardId);
+    async function getCard(userId: string, cardId: string) {
+        return cardsRepository.getCardForUser(cardId, userId);
     }
 
-    async function updateCard(deckId: string, cardId: string, body: CardConfigurationBody) {
-        return await cardsRepository.updateCard(deckId, cardId, body);
+    async function deleteCard(userId: string, deckId: string, cardId: string) {
+        return cardsRepository.deleteCard(deckId, cardId, userId);
     }
 
-    async function getDueCards(deckId: string) {
-        return await cardsRepository.getDueCardsFromDeck(deckId);
+    async function updateCard(userId: string, deckId: string, cardId: string, body: CardConfigurationBody) {
+        return await cardsRepository.updateCard(deckId, cardId, userId, body);
+    }
+
+    async function getDueCards(userId: string, deckId: string) {
+        return await cardsRepository.getDueCardsFromDeck(deckId, userId);
     }
 
 
-    async function updateTimeCurveForCard(cardId: string, configuration: UpdateCurveConfigurationBody) {
-        const card: Card = await cardsRepository.getCardById(cardId);
+    async function updateTimeCurveForCard(userId: string, cardId: string, configuration: UpdateCurveConfigurationBody) {
+        const card: Card = await cardsRepository.getCardForUser(cardId, userId);
         const currentInterval = card.intervalStrength;
 
         const nextIntervalValue = configuration.isAnswerRight
@@ -54,6 +58,7 @@ export default function createCardsService(deps: {
     return {
         getCardsFromDeck,
         getDueCards,
+        getCard,
         addNewCardToDeck,
         importCardsToDeck,
         deleteCard,

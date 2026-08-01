@@ -23,30 +23,37 @@ export const createDecksDAO = (db: any) => ({
                              ${body.isModeReversed}, ${body.isModeNormal})`;
     },
 
-    findById: async (deckId: string) => {
-        const rows = await db`SELECT *
-                                 FROM decks
-                                 WHERE id = ${deckId}`;
+    findByIdForUser: async (deckId: string, userId: string) => {
+        const rows = await db`SELECT d.*
+                                 FROM decks d
+                                          JOIN groups g ON g.id = d.group_id
+                                 WHERE d.id = ${deckId}
+                                   AND g.local_user_id = ${userId}`;
         return rows[0] ?? null;
     },
 
-    update: async (deckId: string, body: Partial<Deck>) => {
+    updateForUser: async (deckId: string, userId: string, body: Partial<Deck>) => {
         // TODO: Change to dynamic fields updating
-        return db`UPDATE decks
+        const rows = await db`UPDATE decks
                      SET name                = ${body.name}
                        , is_mode_normal      = ${body.isModeNormal}
                        , is_mode_reversed    = ${body.isModeReversed}
                        , is_randomized_order = ${body.isRandomizedOrder}
                        , is_mode_typing      = ${body.isModeTyping}
                      WHERE id = ${deckId}
+                       AND group_id IN (SELECT id FROM groups WHERE local_user_id = ${userId})
                      RETURNING *
         `;
+        return rows[0] ?? null;
     },
 
-    delete: async (deckId: string) => {
-        return db`DELETE
+    deleteForUser: async (deckId: string, userId: string) => {
+        const rows = await db`DELETE
                      FROM decks
-                     WHERE id = ${deckId}`;
+                     WHERE id = ${deckId}
+                       AND group_id IN (SELECT id FROM groups WHERE local_user_id = ${userId})
+                     RETURNING *`;
+        return rows[0] ?? null;
     }
 
 });

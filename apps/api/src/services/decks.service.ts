@@ -9,7 +9,8 @@ export const createDecksService = function (deps: {
 }) {
     const {decksRepository, groupsRepository} = deps;
 
-    async function getDecksFromGroup(groupId: string) {
+    async function getDecksFromGroup(userId: string, groupId: string) {
+        await groupsRepository.getByIdAndUserId(groupId, userId);
         return await decksRepository.getGroupDecks(groupId);
     }
 
@@ -19,19 +20,19 @@ export const createDecksService = function (deps: {
         return decksRepository.addDeckToGroup(groupId, deckConfiguration);
     }
 
-    async function updateDeck(deckId: string, deckConfiguration: DeckConfigurationBody) {
-        const existingDeck = await decksRepository.findDeck(deckId);
-        await decksRepository.updateDeck(deckId, deckConfiguration);
+    async function updateDeck(userId: string, deckId: string, deckConfiguration: DeckConfigurationBody) {
+        const existingDeck = await decksRepository.findDeckForUser(deckId, userId);
+        await decksRepository.updateDeckForUser(deckId, userId, deckConfiguration);
 
         return {...existingDeck, ...deckConfiguration}
     }
 
-    async function getDeck(deckId: string) {
-        return decksRepository.findDeck(deckId);
+    async function getDeck(userId: string, deckId: string) {
+        return decksRepository.findDeckForUser(deckId, userId);
     }
 
-    async function deleteDeck(deckId: string) {
-        return decksRepository.deleteDeck(deckId);
+    async function deleteDeck(userId: string, deckId: string) {
+        return decksRepository.deleteDeckForUser(deckId, userId);
     }
 
     async function getDecksStats(userId: string, groupId: string) {

@@ -14,7 +14,8 @@ export default function createCardsRepository(deps: {
 }) {
     const {cardsDAO, decksRepository, db} = deps;
 
-    async function getCardsFromDeck(deckId: string) {
+    async function getCardsFromDeck(deckId: string, userId: string) {
+        await decksRepository.findDeckForUser(deckId, userId);
         const cards: CardPersistence[] = filterRawSqlData(await cardsDAO.findByDeckId(deckId));
         return cardMapper.toDTOList(cards);
     }
@@ -23,7 +24,9 @@ export default function createCardsRepository(deps: {
         return cardsDAO.countByGroupId(groupId);
     }
 
-    async function addNewCardsToDeck(deckId: string, cards: CardConfigurationBody[]) {
+    async function addNewCardsToDeck(deckId: string, userId: string, cards: CardConfigurationBody[]) {
+        await decksRepository.findDeckForUser(deckId, userId);
+
         const payload = cards.map(card => ({
             deck_id: deckId,
             primary_word: card.primaryWord,
@@ -46,36 +49,36 @@ export default function createCardsRepository(deps: {
         return rows?.groupid || null;
     }
 
-    async function addNewCardToDeck(deckId: string, cardConfiguration: CardConfigurationBody) {
-        const existingDeck = await decksRepository.findDeck(deckId);
+    async function addNewCardToDeck(deckId: string, userId: string, cardConfiguration: CardConfigurationBody) {
+        const existingDeck = await decksRepository.findDeckForUser(deckId, userId);
         const newCard = await cardsDAO.add(existingDeck.id, cardConfiguration);
         return cardMapper.toDTO(newCard[0]);
     }
 
-    async function deleteCard(deckId: string, cardId: string) {
-        await decksRepository.findDeck(deckId);
-        const existingCard: Card = await getCardById(cardId);
+    async function deleteCard(deckId: string, cardId: string, userId: string) {
+        await decksRepository.findDeckForUser(deckId, userId);
+        const existingCard: Card = await getCardForUser(cardId, userId);
         return cardsDAO.delete(existingCard.id);
     }
 
-    async function getCardById(cardId: string) {
-        const existingCard: CardPersistence = await cardsDAO.findById(cardId);
+    async function getCardForUser(cardId: string, userId: string): Promise<Card> {
+        const existingCard: CardPersistence = await cardsDAO.findByIdForUser(cardId, userId);
         if (!existingCard) throw new CardsException('Card not found', 404);
 
         return cardMapper.toDTO(existingCard);
     }
 
-    async function updateCard(deckId: string, cardId: string, body: CardConfigurationBody) {
-        await decksRepository.findDeck(deckId);
+    async function updateCard(deckId: string, cardId: string, userId: string, body: CardConfigurationBody) {
+        await decksRepository.findDeckForUser(deckId, userId);
 
-        const existingCard: Card = await getCardById(cardId);
+        const existingCard: Card = await getCardForUser(cardId, userId);
         const updatedCard: Card = {...existingCard, ...body};
 
         return await cardsDAO.update(cardId, updatedCard);
     }
 
-    async function getDueCardsFromDeck(deckId: string) {
-        const existingDeck = await decksRepository.findDeck(deckId);
+    async function getDueCardsFromDeck(deckId: string, userId: string) {
+        const existingDeck = await decksRepository.findDeckForUser(deckId, userId);
 
         const cards = await db`SELECT c.*
                                FROM cards c
@@ -87,11 +90,9 @@ export default function createCardsRepository(deps: {
     }
 
     async function updateTimeCurveForCard(cardId: string, nextIntervalValue: number, nextRepetitionDate: Date) {
-        const card: Card = await cardsDAO.findById(cardId);
-
         return db`UPDATE cards
                   SET (interval_strength, next_repetition_time) = (${nextIntervalValue}, ${nextRepetitionDate})
-                  WHERE id = ${card.id}
+                  WHERE id = ${cardId}
         `;
     }
 
@@ -114,7 +115,7 @@ export default function createCardsRepository(deps: {
         countByGroupId,
         getCardsFromDeck,
         getDueCardsFromDeck,
-        getCardById,
+        getCardForUser,
         getAllUserCardsTotal,
         findGroupByCardId
     }
