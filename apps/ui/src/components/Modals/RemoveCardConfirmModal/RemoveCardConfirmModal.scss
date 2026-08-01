@@ -3,17 +3,17 @@
     font-family: "Gilroy Regular", sans-serif;
     font-size: 20px;
     line-height: 1.5;
-    color: #626262;
+    color: hsl(var(--text-muted));
   }
 }
 
 .remove-card-confirm-modal-button {
-  background-color: #FF7474;
+  background-color: hsl(var(--danger));
   height: 50px;
 
   margin: 20px 0;
 
   &:hover {
-    background-color: #e36767;
+    background-color: hsl(var(--danger-hover));
   }
 }

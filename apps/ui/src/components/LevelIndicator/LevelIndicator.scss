@@ -7,7 +7,7 @@
 }
 
 .level-indicator {
-  & > div { background-color: #D9D9D9; width: 5px; margin-left: 2px }
+  & > div { background-color: hsl(var(--track)); width: 5px; margin-left: 2px }
 
   display: flex;
   align-items: flex-end;
@@ -18,8 +18,8 @@
     }
   }
 
-  &[data-level="Very low"] { @include set-level-background(#50a121, 1); }
-  &[data-level="Low"] { @include set-level-background(#E82626, 2); }
-  &[data-level="Medium"] { @include set-level-background(#E1BD00, 3); }
-  &[data-level="High"] { @include set-level-background(#9D00D5, 4); }
+  &[data-level="Very low"] { @include set-level-background(hsl(var(--success-strong)), 1); }
+  &[data-level="Low"] { @include set-level-background(hsl(var(--danger-strong)), 2); }
+  &[data-level="Medium"] { @include set-level-background(hsl(var(--warning)), 3); }
+  &[data-level="High"] { @include set-level-background(hsl(var(--level-high)), 4); }
 }

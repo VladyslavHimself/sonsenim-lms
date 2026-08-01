@@ -1,8 +1,7 @@
 .auth-wrapper {
   width: 100%;
   height: 100vh;
-  background: url("../assets/waves.png") no-repeat top center/contain;
-  background-color: #fff;
+  background: hsl(var(--surface-raised)) url("../assets/waves.png") no-repeat top;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -23,7 +22,7 @@
     h1 {
       font-size: 38px;
       font-family: "Gilroy Bold", sans-serif;
-      color: #F18C29;
+      color: hsl(var(--brand));
     }
   }
   .auth-container-body {
@@ -46,7 +45,7 @@
     & > a {
       margin-left: 15px;
       font-family: "Gilroy Bold", sans-serif;
-      color: #F18C29;
+      color: hsl(var(--brand));
       font-size: 18px;
       line-height: 1.5;
     }
@@ -92,7 +91,7 @@
     align-items: center;
 
     a {
-      color: #F18C29;
+      color: hsl(var(--brand));
       font-size: 18px;
       padding-bottom: 2px;
     }

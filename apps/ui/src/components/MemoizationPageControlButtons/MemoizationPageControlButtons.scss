@@ -16,23 +16,23 @@
             }
 
             &.fail-button {
-                background-color: #FF7474;
+                background-color: hsl(var(--danger));
 
                 &:hover {
-                    background-color: #e66060;
+                    background-color: hsl(var(--danger-hover));
                 }
             }
 
             &.success-button {
-                background-color: #8AE899;
+                background-color: hsl(var(--success));
 
                 &:hover {
-                    background-color: #74d281;
+                    background-color: hsl(var(--success-hover));
                 }
             }
 
             &.continue-button {
-                background-color: #749DB3;
+                background-color: hsl(var(--neutral-info));
             }
         }
     }

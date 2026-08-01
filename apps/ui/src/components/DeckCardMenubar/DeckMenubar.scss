@@ -2,7 +2,7 @@
 .deck-menubar {
     width: 350px !important;
     border: 5px solid white;
-    background-color: #F4F4F4 !important;
+    background-color: hsl(var(--surface-raised)) !important;
 
     .deck-menubar-container {
         .menubar-list-item {
@@ -14,7 +14,7 @@
             display: flex;
             justify-content: flex-start;
 
-            background-color: #F4F4F4;
+            background-color: hsl(var(--surface-raised));
             border: none;
             font-size: 16px;
             font-family: "Gilroy Light", sans-serif;
@@ -23,13 +23,13 @@
                 width: 30px;
                 height: 35px;
                 margin-right: 15px;
-                color: #F18C29;
+                color: hsl(var(--brand));
             }
 
 
             &:hover {
                 font-family: "Gilroy Regular", sans-serif;
-                background-color: rgba(241, 140, 41, 0.16);
+                background-color: hsl(var(--brand) / 0.16);
             }
         }
     }

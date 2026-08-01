@@ -65,7 +65,7 @@ export default function EditDeckModal({ deckProperties, refetchDecks, modal }: P
                             label="Deck Name" isRequired
                             placeholder="Animals and fruits"
                         />
-                        <Separator className="my-6 h-1 bg-[#F0F0F0]"/>
+                        <Separator className="my-6 h-1 bg-border"/>
                         <ModesToggleGroup defaultValues={defaultToggleValues} form={form} />
                     </form>
                 </Form>

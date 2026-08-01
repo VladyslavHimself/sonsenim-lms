@@ -35,7 +35,7 @@ function RadioGroupItem({
         data-slot="radio-group-indicator"
         className="flex size-4 items-center justify-center"
       >
-        <span className="absolute top-1/2 left-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-500" />
+        <span className="absolute top-1/2 left-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand" />
       </RadioGroupPrimitive.Indicator>
     </RadioGroupPrimitive.Item>
   )

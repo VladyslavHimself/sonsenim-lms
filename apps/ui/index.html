@@ -6,8 +6,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#F4F4F4">
     <title>Sonsenim LMS</title>
+    <script>
+      // Resolve the theme before first paint so dark users never flash a light screen.
+      (function () {
+        try {
+          var stored = localStorage.getItem('theme');
+          var isDark = stored === 'dark' ||
+            ((!stored || stored === 'system') &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+          document.documentElement.classList.toggle('dark', isDark);
+          document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+          document.querySelector('meta[name="theme-color"]')
+            .setAttribute('content', isDark ? '#15181E' : '#F4F4F4');
+        } catch (e) {}
+      })();
+    </script>
     <style>
       body { background-color: #F4F4F4; }
+      html.dark body { background-color: #15181E; }
     </style>
   </head>
   <body>

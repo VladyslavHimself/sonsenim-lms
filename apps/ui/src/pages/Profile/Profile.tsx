@@ -8,9 +8,12 @@ import dayjs from "dayjs";
 import {useMediaQuery} from "react-responsive";
 import PageHeaderSectionTitle
     from "@/components/Dashboard/DashboardHeaderSection/PageHeaderSectionTitle/PageHeaderSectionTitle.tsx";
+import ThemeToggle from "@/theme/ThemeToggle.tsx";
+import {useTheme} from "@/theme/ThemeProvider.tsx";
 
 export default function Profile() {
     const isMobile = useMediaQuery({query: "(max-width: 700px)"});
+    const { resolvedTheme } = useTheme();
     const { userData } = useUser();
     const { firstName, lastName, email, totalDecks, totalCards, createdAt } = userData || {};
 
@@ -43,6 +46,15 @@ export default function Profile() {
                         <div className="profile-page-group-section-item">During - <span>lifetime</span></div>
                     </div>
                     <Button className="profile-page-group-premium-button">Buy premium</Button>
+                </div>
+            </div>
+            <div className="profile-page-group-section">
+                <div className="profile-page-group-section-header">Appearance</div>
+                <div className="profile-page-group-section-content">
+                    <div className="profile-page-group-section-item">
+                        Theme - <span>{resolvedTheme === 'dark' ? 'dark' : 'light'}</span>
+                    </div>
+                    <ThemeToggle className="profile-page-theme-toggle"/>
                 </div>
             </div>
             <div className="profile-page-content-strip">

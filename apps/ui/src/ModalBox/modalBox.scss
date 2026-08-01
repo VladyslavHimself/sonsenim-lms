@@ -1,7 +1,7 @@
 .modal-root {
 
   .modal-backdrop {
-    background-color: rgba(#000, 0.2);
+    background-color: hsl(var(--overlay) / var(--overlay-opacity));
     position: fixed;
     top: 0;
     right: 0;
@@ -25,7 +25,7 @@
       max-width: 650px;
       width: 90%;
       margin: 100px auto auto;
-      background-color: #f4f4f4;
+      background-color: hsl(var(--surface-raised));
       border-radius: 12px;
 
       .modal-box-header {
@@ -78,7 +78,7 @@
       }
 
       .modal-box-cancel-button {
-        background-color: #FF7474;
+        background-color: hsl(var(--danger));
         flex: 0 1 45px;
         padding: 25px 20px;
         border-radius: 12px;

@@ -146,7 +146,7 @@ export default function ImportCardsModal({deckId, modal}: Props) {
                                        </FormItem>
                                    )}/>
 
-                        <Separator className="my-6 h-1 bg-[#F0F0F0]"/>
+                        <Separator className="my-6 h-1 bg-border"/>
                         <Field>
                             <ModalFormFieldLabel label="Paste data into the form" isRequired/>
                             <Textarea

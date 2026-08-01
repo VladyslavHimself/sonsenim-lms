@@ -7,6 +7,7 @@ import {Link, useLocation, useNavigate} from "react-router-dom";
 import React, {useMemo} from "react";
 import useLogout from "@/api/auth/useLogout.ts";
 import {useQueryClient} from "@tanstack/react-query";
+import ThemeToggle from "@/theme/ThemeToggle.tsx";
 
 const TOP_NAVLINKS = [
     {
@@ -62,7 +63,7 @@ export default function NavSidebarList(
                         <Link to={href}>
                             <div
                                 className={`nav-sidebar-item ${location.pathname.includes(href) && "nav-sidebar-item--active"}`}>
-                                <img src={icon} alt={alt}/>
+                                <img className="icon-adaptive" src={icon} alt={alt}/>
                                 <span>{title}</span>
                             </div>
                         </Link>
@@ -70,11 +71,12 @@ export default function NavSidebarList(
                 }
             </div>
             <div>
+                <ThemeToggle className="nav-sidebar-item" showLabel={!isSidebarCollapsed}/>
                 {
                     BOTTOM_NAVLINKS({logout: logoutUser, collapseSidebar},
                         {isSidebarCollapsed}).map(({title, icon, alt, action}) => (
                         <div className="nav-sidebar-item" onClick={action}>
-                            <img src={icon} alt={alt}/>
+                            <img className="icon-adaptive" src={icon} alt={alt}/>
                             <span>{title}</span>
                         </div>
                     ))

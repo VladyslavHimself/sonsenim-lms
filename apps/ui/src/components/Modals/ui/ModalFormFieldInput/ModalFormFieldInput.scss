@@ -15,6 +15,6 @@
 
     &::placeholder {
         font-family: "Gilroy Light", sans-serif;
-        color: #B9B9B9;
+        color: hsl(var(--text-placeholder));
     }
 }

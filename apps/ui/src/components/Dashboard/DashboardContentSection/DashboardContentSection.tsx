@@ -1,4 +1,5 @@
 import './DashboardContentSection.scss';
+import {useMemo} from "react";
 import {useQueryClient} from "@tanstack/react-query";
 import {UserGroupResponse} from "@/api/groups/groups.ts";
 import NoGroupsAlert from "@/components/Dashboard/DashboardContentSection/NoGroupsAlert.tsx";
@@ -10,6 +11,7 @@ import {useMediaQuery} from "react-responsive";
 import LineChart from "@/components/Dashboard/DashboardContentSection/LineChart.tsx";
 import {transformData} from "@/components/Dashboard/DashboardContentSection/dashboardContentSection.service.ts";
 import WeeklyReportChartLegend from "@/components/Dashboard/WeeklyReportChartLegend/WeeklyReportChartLegend.tsx";
+import {useTheme} from "@/theme/ThemeProvider.tsx";
 
 type Props = {
     selectedGroup: SelectionItem
@@ -25,6 +27,12 @@ export default function DashboardContentSection({ selectedGroup }: Props) {
         query.getQueryData<UserGroupResponse[]>(['user-groups'])?.length;
 
     const { cardsIntervalHistoryData, actualDayInfo } = useCardsIntervalHistory(selectedGroup.value);
+    const { resolvedTheme } = useTheme();
+
+    const chartData = useMemo(
+        () => cardsIntervalHistoryData && transformData(cardsIntervalHistoryData),
+        [cardsIntervalHistoryData, resolvedTheme]
+    );
 
     if (!isUserHaveAnyGroups) {
         return (
@@ -46,7 +54,7 @@ export default function DashboardContentSection({ selectedGroup }: Props) {
             { isMobile && <WeeklyReportChartLegend actualIndications={actualDayInfo} />}
             <div className="weekly-report-chart-container">
                 { !isMobile && <WeeklyReportChartLegend actualIndications={actualDayInfo} />}
-                <LineChart isMobile={isMobile} data={cardsIntervalHistoryData && transformData(cardsIntervalHistoryData)}/>
+                <LineChart isMobile={isMobile} data={chartData}/>
             </div>
         </div>
     );

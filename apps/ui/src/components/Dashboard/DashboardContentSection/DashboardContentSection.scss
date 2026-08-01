@@ -12,7 +12,7 @@
         margin-top: 15px;
         width: 100%;
         max-width: 800px;
-        background-color: #ECECEC;
+        background-color: hsl(var(--surface-muted));
         border-radius: 11px;
         flex-direction: column;
 
@@ -26,7 +26,7 @@
     .weekly-report-chart-legend {
         display: flex;
         padding: 20px;
-        background-color: #ECECEC;
+        background-color: hsl(var(--surface-muted));
         border-radius: 13px;
 
         @media screen and (max-width: 600px) {
@@ -41,10 +41,10 @@
 
             &:not(:first-child) { margin-left: 25px; }
 
-            &:nth-child(1) { color: #50a121; }
-            &:nth-child(2) { color: #E82626; }
-            &:nth-child(3) { color: #E1BD00; }
-            &:nth-child(4) { color: #9D00D5; }
+            &:nth-child(1) { color: hsl(var(--success-strong)); }
+            &:nth-child(2) { color: hsl(var(--danger-strong)); }
+            &:nth-child(3) { color: hsl(var(--warning)); }
+            &:nth-child(4) { color: hsl(var(--level-high)); }
 
             div:nth-child(1) {
                 font-family: "Gilroy Medium", sans-serif;

@@ -44,7 +44,7 @@ export default function CreateNewDeckModal({ groupId, modal }: Props) {
                             label="Deck Name" isRequired
                             placeholder="Animals and fruits"
                         />
-                        <Separator className="my-6 h-1 bg-[#F0F0F0]" />
+                        <Separator className="my-6 h-1 bg-border" />
                         <ModesToggleGroup defaultValues={['isModeNormal']} form={form} />
                     </form>
                 </Form>
