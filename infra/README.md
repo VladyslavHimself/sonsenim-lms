@@ -102,7 +102,47 @@ status alone does not distinguish the cases, since 400 covers several:
 A token that is valid but under-scoped fails differently again — the plan gets through
 authentication and then returns 403 on specific resources.
 
-### 3. Fill in the account ID
+### 3. R2 credentials for the state backend
+
+State lives in the R2 bucket `sonsenim-tfstate`, accessed through R2's S3-compatible API. That
+is a **second, separate credential** from `CLOUDFLARE_API_TOKEN` — an R2 API token, created at
+R2 → API → Manage API Tokens with **Object Read & Write** on that bucket.
+
+The token screen shows three values. Only two are the S3 pair:
+
+| Field | Use |
+|---|---|
+| **Access Key ID** (32 hex) | `AWS_ACCESS_KEY_ID` — shown permanently in the dashboard |
+| **Secret Access Key** (64 hex) | `AWS_SECRET_ACCESS_KEY` — shown once, never again |
+| Token value | R2's REST API. **Not** the S3 secret; will not authenticate the backend |
+
+Store the secret and export both:
+
+```bash
+security add-generic-password -a "$USER" -s r2-tfstate-secret -w -U
+```
+
+```bash
+export AWS_ACCESS_KEY_ID="<access key id>"; export AWS_SECRET_ACCESS_KEY="$(security find-generic-password -a "$USER" -s r2-tfstate-secret -w)"
+```
+
+Check the lengths before running Terraform — `id=32 secret=64` is the only correct answer, and it
+takes a second versus a confusing 403 later:
+
+```bash
+echo "id=${#AWS_ACCESS_KEY_ID} secret=${#AWS_SECRET_ACCESS_KEY}"
+```
+
+**Debugging a 403 from the backend.** Terraform reports a bare `Forbidden` that cannot distinguish
+bad credentials from bad scope. R2's own error body is more useful. `infra/r2check.py` signs a
+request directly and reports both — run it before assuming the backend config is wrong:
+
+- Both ListBuckets and ListObjectsV2 403 → the credential pair is rejected. Usually a **rolled
+  token**: rolling issues a new Access Key ID *and* a new secret, and updating only the secret
+  leaves a mismatched pair.
+- ListBuckets succeeds, ListObjectsV2 403s → credentials fine, token scoped to a different bucket.
+
+### 4. Fill in the account ID
 
 ```bash
 cp infra/terraform.tfvars.example infra/terraform.tfvars
@@ -114,14 +154,18 @@ Then set `account_id`. Find it in the dashboard sidebar of any domain, or:
 curl -s -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" https://api.cloudflare.com/client/v4/accounts
 ```
 
-### 4. Initialize
+### 5. Initialize
 
 ```bash
 terraform -chdir=infra init
 ```
 
-This downloads the provider and writes `.terraform.lock.hcl`. **Commit that lock file** — it pins
-provider hashes so everyone resolves the same version.
+This downloads the provider, connects to the R2 backend, and writes `.terraform.lock.hcl`.
+**Commit that lock file** — it pins provider hashes so everyone resolves the same version.
+
+State is remote, so there is no local `terraform.tfstate` to protect after this point. A stale one
+may still exist from before the migration; it is gitignored and safe to leave, but it is a backup,
+not the live state.
 
 ## Importing existing infrastructure
 

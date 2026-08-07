@@ -79,15 +79,23 @@ import. Flagged here so it is a deliberate choice later, not an accident.
 Terraform keeps a state file mapping config to real resources. It contains secrets in plaintext
 and must never be committed.
 
-**Plan: start local, migrate to remote when CI needs it.**
+**Status: state lives in R2 (migrated 2026-08-07).** Bucket `sonsenim-tfstate`, via the
+S3-compatible backend configured in [infra/versions.tf](../infra/versions.tf).
 
-- Milestones 1–3 run with local state (`infra/terraform.tfstate`, gitignored). Solo, no
-  concurrency, nothing to coordinate.
-- Milestone 5 (GitHub Actions) is the point where remote state becomes mandatory — CI has no
-  local file. Migrate then with `terraform init -migrate-state`, a one-command move.
-- Recommended remote backend: **HCP Terraform free tier** (remote state, locking, run history,
-  free for small teams). An R2 bucket via the S3-compatible backend also works, but adds a
-  Cloudflare resource this project otherwise has no use for.
+Milestones 1–4 ran on local state, which was fine for one operator with no concurrency. It moved
+to R2 with a single `terraform init -migrate-state` once CI became the goal, since CI has no local
+file.
+
+Two things worth knowing about this choice:
+
+- **R2 requires a payment method on file**, even to use only the free tier. Usage here is
+  genuinely free — a state file is a few hundred KB against a 10 GB allowance, and a plan costs a
+  handful of operations against a million — but the card is not optional. HCP Terraform's free
+  tier is the alternative if that ever becomes unwelcome.
+- **Credentials are separate from `CLOUDFLARE_API_TOKEN`.** The backend authenticates with an R2
+  API token's S3 key pair (`AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`). Cloudflare's own
+  documentation puts these inline in the `.tf` file; they are read from the environment here
+  instead, because that file is committed.
 
 ## Layout
 
