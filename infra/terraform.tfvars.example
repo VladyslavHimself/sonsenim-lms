@@ -1,0 +1,11 @@
+// Copy to terraform.tfvars (gitignored) and fill in.
+// The API token does NOT go here — it is read from the CLOUDFLARE_API_TOKEN env var.
+
+account_id = "e4048fea381881a01fd409e6613d6ac5"
+
+// Postgres passwords for the Supabase instances behind Hyperdrive.
+// Supabase dashboard → Project Settings → Database, or the password embedded in the
+// DATABASE_URL you use for dbmate. Terraform does not push these (see hyperdrive.tf),
+// but they must be correct.
+hyperdrive_nonprod_password    = ""
+hyperdrive_production_password = ""
