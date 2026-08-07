@@ -27,14 +27,16 @@ which is account-wide and cannot be scoped.
 
 Six permission rows — the three dropdowns per row are (type, permission group, access level):
 
-| Type | Permission group | Level |
-|---|---|---|
-| Account | Hyperdrive | Edit |
-| Account | Cloudflare Pages | Edit |
-| Zone | Zone | Read |
-| Zone | DNS | Edit |
-| Zone | Zone Settings | Edit |
-| Zone | Workers Routes | Edit |
+| Type | Permission group | Level | Needed for |
+|---|---|---|---|
+| Account | Hyperdrive | Edit | `hyperdrive.tf` |
+| Account | Cloudflare Pages | Edit | `pages.tf` |
+| Zone | Zone | Read | zone lookup in `zone.tf` |
+| Zone | DNS | Edit | `dns.tf` |
+| Zone | Zone Settings | Edit | `zone_settings.tf` |
+| Zone | Workers Routes | Edit | `worker_routes.tf` |
+| Zone | Zone WAF | Edit | `rate_limit.tf` — rate limiting rules live in the WAF rulesets API |
+| Account | Access: Apps and Policies | Edit | `access.tf`, only if `enable_staging_access` is true |
 
 Deliberately **not** granted: `Workers Scripts: Edit`. Terraform manages the routes that point at
 Workers; wrangler deploys the scripts themselves. Granting script-edit here would hand Terraform
@@ -250,6 +252,27 @@ terraform -chdir=infra apply
 ```
 
 `terraform -chdir=infra state list` shows what is currently under management.
+
+## CLOUDFLARE_API_TOKEN breaks wrangler
+
+Wrangler prefers `CLOUDFLARE_API_TOKEN` over its own OAuth session when the variable is set. This
+token grants Workers Scripts **Read**, on purpose — Terraform manages routes, wrangler manages
+scripts — so any wrangler command that writes fails:
+
+```
+✘ [ERROR] A request to the Cloudflare API (/memberships) failed.
+  Authentication error [code: 10000]
+```
+
+That includes `wrangler deploy` and `wrangler secret put`. The fix is not to widen the token,
+which would defeat the ownership split. Unset it for the command:
+
+```bash
+env -u CLOUDFLARE_API_TOKEN pnpm --filter api exec wrangler secret put JWT_SECRET --env staging
+```
+
+Better still, export `CLOUDFLARE_API_TOKEN` only in the shell where you run Terraform rather than
+globally in a shell rc file.
 
 ## Do not
 
