@@ -59,6 +59,29 @@ jobs:
         with:
           node-version: "20"
 
+      # GitHub resolves a missing secret to an empty string rather than failing, so an unset
+      # secret surfaces much later as a confusing error from whatever consumed it — an absent
+      # R2 key pair, for instance, makes Terraform report "No valid credential sources found"
+      # and start looking for an EC2 instance role. Fail here instead, naming what is missing.
+      - name: Check required secrets
+        run: |
+          missing=""
+          for var in CLOUDFLARE_API_TOKEN AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY \
+                     TF_VAR_hyperdrive_nonprod_password TF_VAR_hyperdrive_production_password; do
+            [ -z "${!var}" ] && missing="$missing $var"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repository secrets for:$missing"
+            echo "Set them under Settings → Secrets and variables → Actions."
+            echo "Note the repo secret names differ from the variables above:"
+            echo "  R2_ACCESS_KEY_ID              -> AWS_ACCESS_KEY_ID"
+            echo "  R2_SECRET_ACCESS_KEY          -> AWS_SECRET_ACCESS_KEY"
+            echo "  HYPERDRIVE_NONPROD_PASSWORD   -> TF_VAR_hyperdrive_nonprod_password"
+            echo "  HYPERDRIVE_PRODUCTION_PASSWORD-> TF_VAR_hyperdrive_production_password"
+            exit 1
+          fi
+          echo "All required secrets are present."
+
       - name: Formatting
         run: terraform -chdir=infra fmt -check -recursive -diff
 
