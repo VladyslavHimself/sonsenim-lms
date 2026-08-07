@@ -1,6 +1,11 @@
 variable "account_id" {
   type        = string
   description = "Cloudflare account ID. Dashboard → any domain → Overview, right-hand sidebar."
+
+  // Defaulted rather than required: an account ID identifies, it does not authenticate, and it
+  // is already committed in terraform.tfvars.example and referenced throughout the docs.
+  // Defaulting it keeps CI from needing a secret for a value that is not secret.
+  default = "e4048fea381881a01fd409e6613d6ac5"
 }
 
 variable "zone_name" {

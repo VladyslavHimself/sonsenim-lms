@@ -231,8 +231,9 @@ Two ways to fix that, and the obvious one was not chosen:
 pnpm infra:check
 ```
 
-Reads local Terraform state only — no Cloudflare credentials needed, so it is safe to run
-anywhere, including in CI without secrets.
+Reads Terraform outputs rather than the Cloudflare API, so it needs no `CLOUDFLARE_API_TOKEN`. It
+does need the state backend's credentials now that state lives in R2 — this was credential-free
+while state was local, and moving the backend quietly changed that.
 
 The script ([infra/check-wrangler-sync.mjs](../infra/check-wrangler-sync.mjs)) treats "found no
 Hyperdrive bindings at all" as a failure rather than a pass. A check that silently succeeds when
@@ -240,12 +241,30 @@ it cannot find what it is checking is worse than no check.
 
 ### 5 — CI
 
-`.github/workflows/` is currently empty, so there is no existing pipeline to retrofit.
+[.github/workflows/terraform.yml](../.github/workflows/terraform.yml): `fmt -check`, `init`,
+`validate`, `pnpm infra:check` and `plan` on pull requests with the plan posted as a comment;
+`apply` on merge to `main`. Runs are serialised through a concurrency group, since two concurrent
+applies would contend for the state lock.
 
-- On PR: `terraform fmt -check`, `terraform validate`, `terraform plan`, plan posted as a comment.
-- On merge to `main`: `terraform apply`, then `wrangler deploy` as a separate downstream job.
-- Separate repo secrets for the Terraform token and the wrangler token — different blast radius.
-- Migrate state to the remote backend as part of this milestone.
+**Five repository secrets are required.** This is more than it looks like it should be, and each
+one has a reason:
+
+| Secret | Why |
+|---|---|
+| `CLOUDFLARE_API_TOKEN` | Provider authentication |
+| `R2_ACCESS_KEY_ID` | State backend — a *separate* credential from the token above |
+| `R2_SECRET_ACCESS_KEY` | State backend |
+| `HYPERDRIVE_NONPROD_PASSWORD` | `origin.password` is required by the provider but never returned by the API, so it cannot be read back from the live config |
+| `HYPERDRIVE_PRODUCTION_PASSWORD` | as above |
+
+`account_id` is deliberately **not** a secret — it identifies, it does not authenticate, and it is
+defaulted in `variables.tf`.
+
+The Hyperdrive passwords could be avoided by defaulting those variables to `""`, since
+`ignore_changes` means Terraform never pushes them. That trades two secrets for a config that
+would silently write an empty password if a Hyperdrive config were ever recreated. Not worth it.
+
+The UI needs no deploy job: its Pages project is git-connected and Cloudflare builds it.
 
 **Note:** The UI does not need a deploy step in CI. The Pages project is **git-connected**, and
 Cloudflare builds it itself (`pnpm run ui:build` → `apps/ui/dist`) — `production` branch for

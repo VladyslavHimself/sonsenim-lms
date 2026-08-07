@@ -9,7 +9,9 @@
 // quietly bind to one that no longer exists — the Worker starts up fine and fails on the first
 // database query.
 //
-// Reads local Terraform state only. No Cloudflare credentials required.
+// Reads Terraform outputs, never the Cloudflare API — so it needs no CLOUDFLARE_API_TOKEN. It
+// does need the state backend's credentials (AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY) now that
+// state lives in R2 rather than on disk.
 //
 // Usage: pnpm infra:check
 
@@ -49,10 +51,23 @@ try {
   });
   outputs = JSON.parse(raw);
 } catch (error) {
-  const first = String(error.stderr || error.message).trim().split("\n")[0];
+  // Show what Terraform actually said. Its first line is often just a box-drawing character,
+  // so print the whole thing with ANSI stripped rather than guessing at the cause.
+  const stderr = String(error.stderr || error.message)
+    // eslint-disable-next-line no-control-regex
+    .replace(/\[[0-9;]*m/g, "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line && line !== "│" && line !== "╷" && line !== "╵")
+    .map((line) => `    ${line}`)
+    .join("\n");
+
   fail(
     "could not read Terraform outputs",
-    `    ${first}\n\n    Is terraform installed, and has \`terraform -chdir=infra apply\` been run?`,
+    `${stderr}\n\n` +
+      "    State lives in R2, so this needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY\n" +
+      "    (the R2 API token's S3 pair) in addition to terraform being installed and\n" +
+      "    `terraform -chdir=infra init` having been run. See infra/README.md.",
   );
 }
 
