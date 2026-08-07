@@ -202,13 +202,33 @@ handshakes are refused.
 
 ### 4 — Close the Terraform → wrangler loop
 
-Hyperdrive IDs are hardcoded in [apps/api/wrangler.toml](../apps/api/wrangler.toml) today. Once
-Terraform owns those configs, that file becomes a second copy of the truth that can silently
-drift.
+**Status: done (2026-08-07).**
 
-Fix: `wrangler.toml.tmpl` with `${HYPERDRIVE_STAGING_ID}` placeholders, rendered by `envsubst`
-from `terraform output` in the deploy script. Small mechanical change, but it is the difference
-between infrastructure-as-code and infrastructure-described-twice.
+Hyperdrive IDs are hardcoded in [apps/api/wrangler.toml](../apps/api/wrangler.toml), while
+Terraform owns the configs themselves — the same ID written in two places, with nothing keeping
+them honest. Recreating a Hyperdrive config assigns a new ID, and the next deploy would bind to
+one that no longer exists: the Worker starts fine and fails on its first query.
+
+Two ways to fix that, and the obvious one was not chosen:
+
+- **Generate** `wrangler.toml` from a tracked template via `envsubst`, gitignoring the result.
+  One source of truth, but every `wrangler dev` and every deploy depends on the generate step
+  having run, and CI needs a Cloudflare token merely to read outputs. That is real, permanent
+  friction traded against a rare failure.
+- **Verify** — what is implemented. `pnpm infra:check` reads `terraform output` and the toml and
+  fails if they disagree. The ID still lives in two places, but divergence becomes loud instead
+  of silent, and nothing about local development changes.
+
+```bash
+pnpm infra:check
+```
+
+Reads local Terraform state only — no Cloudflare credentials needed, so it is safe to run
+anywhere, including in CI without secrets.
+
+The script ([infra/check-wrangler-sync.mjs](../infra/check-wrangler-sync.mjs)) treats "found no
+Hyperdrive bindings at all" as a failure rather than a pass. A check that silently succeeds when
+it cannot find what it is checking is worse than no check.
 
 ### 5 — CI
 
