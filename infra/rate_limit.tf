@@ -20,28 +20,31 @@ resource "cloudflare_ruleset" "auth_rate_limit" {
     action      = "block"
     enabled     = true
 
-    expression = <<-EOT
-      (http.host in {"api.sonsennim.com" "staging-api.sonsennim.com"}
-       and (http.request.uri.path eq "/v1/api/auth/login"
-            or http.request.uri.path eq "/v1/api/auth/register"))
-    EOT
+    // One line rather than a heredoc purely for readability of the stored value; a multi-line
+    // heredoc works too, and its newlines are preserved verbatim in the API.
+    expression = "(http.host in {\"api.sonsennim.com\" \"staging-api.sonsennim.com\"}) and (http.request.uri.path eq \"/v1/api/auth/login\" or http.request.uri.path eq \"/v1/api/auth/register\")"
 
     ratelimit = {
-      // ip.src + cf.colo.id is the characteristic pair available below Enterprise. Counting per
-      // colo means the effective global limit is higher than the number below, since a
-      // distributed attacker hits several data centres — it still stops single-source guessing.
+      // cf.colo.id is mandatory, not a choice: dropping it fails with "characteristics field is
+      // missing 'cf.colo.id', this is required as ratelimiting counting is processed at
+      // colocation level only".
+      //
+      // The practical consequence is that the counter is per data centre, so the effective
+      // global limit is the number below multiplied by however many colos an attacker reaches.
       characteristics = ["ip.src", "cf.colo.id"]
 
       // period is capped at 10 seconds on this plan. Cloudflare rejects anything else with
       // "not entitled to use the period 60, can only use a period among [10]".
       //
-      // A 10-second window is a blunt instrument for credential stuffing: it caps burst rate but
-      // barely constrains a patient attacker, who can sustain 5 attempts every 10 seconds
-      // indefinitely — 30 a minute, per data centre. Treat this as a speed bump that raises the
-      // cost of naive scripted guessing, not as brute-force protection.
+      // These numbers are a ceiling, not a promise. Measured against the live rule: a burst of
+      // 60 requests got its first 429 at request 44, nowhere near the nominal 5 per 10 seconds.
+      // Counters are maintained per colo and converge lazily, so short bursts overshoot badly.
+      // Do not conclude the rule is broken because a dozen requests sail through — send enough
+      // traffic to clear the leeway before judging it.
       //
-      // Real protection is application-side: account lockout after N failures, or exponential
-      // backoff keyed on the username rather than the IP. Neither exists yet.
+      // So: a speed bump against naive scripted guessing, not brute-force protection. Real
+      // protection is application-side — backoff or lockout keyed on the username rather than
+      // the IP, which an attacker cannot sidestep by rotating addresses. That does not exist yet.
       period              = 10
       requests_per_period = 5
 
