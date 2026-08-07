@@ -33,3 +33,27 @@ variable "hyperdrive_production_password" {
   sensitive   = true
   description = "Postgres password for the production Supabase instance."
 }
+
+// --- Cloudflare Access ------------------------------------------------------
+
+variable "enable_staging_access" {
+  type        = bool
+  description = <<-EOT
+    Put Cloudflare Access in front of staging-api.sonsennim.com.
+
+    Off by default: enabling it will break the staging UI's cross-origin API calls until that
+    client authenticates with an Access service token. See access.tf before turning this on.
+  EOT
+  default     = false
+}
+
+variable "access_allowed_email" {
+  type        = string
+  description = "Email address allowed through the staging Access policy. Only read when enable_staging_access is true."
+  default     = ""
+
+  validation {
+    condition     = var.access_allowed_email == "" || can(regex("@", var.access_allowed_email))
+    error_message = "access_allowed_email must be an email address."
+  }
+}

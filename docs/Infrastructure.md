@@ -274,13 +274,40 @@ production, `main` for previews, scoped to `apps/ui/*`. Pushing is the deploy.
 they must be set as **Pages environment variables**, which Terraform manages via
 `deployment_configs`. CI only needs to deploy the API Worker.
 
-### 6 — Follow-ons, once the loop works
+### 6 — Follow-ons
 
-- Rate-limit ruleset on `/v1/api/auth/*`.
-- Cloudflare Access in front of the staging hostnames.
-- Move the JWT signing secret out of source — it is hardcoded as `'supersecret'` in
-  [apps/api/src/plugins/jwt.ts](../apps/api/src/plugins/jwt.ts). This is a live vulnerability
-  independent of any IaC work and should not wait on it.
+**Rate limiting** — [infra/rate_limit.tf](../infra/rate_limit.tf). 10 requests per minute per IP
+to `/v1/api/auth/login` and `/register`, then blocked for 60 seconds.
+
+Scoped to those two paths only. `/auth/refresh` is deliberately excluded: clients call it every
+time a 15-minute access token expires, so a per-IP limit would punish users behind a shared NAT
+for using the app normally. Note the counter is per Cloudflare data centre (`ip.src` +
+`cf.colo.id` is the characteristic pair available below Enterprise), so a distributed attacker
+gets a higher effective global limit — it stops single-source guessing, not a botnet.
+
+**Cloudflare Access on staging** — [infra/access.tf](../infra/access.tf). Written, and **disabled
+by default** via `enable_staging_access`.
+
+Access redirects unauthenticated browser requests to an identity provider. That suits a site you
+navigate to, and breaks an API called by JavaScript from another origin: the staging UI's XHR
+would meet a login redirect instead of JSON, surfacing as an opaque CORS failure. Enabling it
+needs the staging client to authenticate with an Access service token first. Worth weighing
+against the fact that staging shares a database with development — if that data is synthetic,
+the exposure may not justify the friction.
+
+**JWT signing secret** — was the literal string `'supersecret'` in
+[apps/api/src/plugins/jwt.ts](../apps/api/src/plugins/jwt.ts), in a public repository. Anyone who
+read it could mint a valid token for any user.
+
+It now comes from `JWT_SECRET`: a Worker secret binding in deployed environments (surfaced on
+`process.env` by the `nodejs_compat_populate_process_env` flag already set in `wrangler.toml`),
+and `.env` under Bun locally. A missing secret is fatal at startup rather than falling back to a
+default — an API that refuses to boot is a better outcome than one that runs and issues forgeable
+tokens.
+
+**Rotating the secret invalidates every existing session.** All users are logged out on deploy.
+That is unavoidable: the old tokens were signed with a secret that is public, and continuing to
+honour them is the vulnerability.
 
 ## Known gotchas
 
