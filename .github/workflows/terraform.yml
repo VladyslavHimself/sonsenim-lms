@@ -1,0 +1,133 @@
+name: Terraform
+
+# Plan on pull requests, apply on merge to main.
+#
+# The UI deliberately has no deploy job here: its Pages project is git-connected and Cloudflare
+# builds it directly from the `production` branch. See docs/Infrastructure.md.
+
+on:
+  pull_request:
+    paths:
+      - "infra/**"
+      - "apps/api/wrangler.toml"
+      - ".github/workflows/terraform.yml"
+  push:
+    branches: [main]
+    paths:
+      - "infra/**"
+      - "apps/api/wrangler.toml"
+      - ".github/workflows/terraform.yml"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+# State locking means two concurrent applies would fight over the lock. Serialise them, and let a
+# superseded plan on the same PR be cancelled.
+concurrency:
+  group: terraform-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  # Provider authentication.
+  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+  # State backend. These are the R2 API token's S3 key pair — a separate credential from
+  # CLOUDFLARE_API_TOKEN, and a "Forbidden" here means these rather than the token above.
+  AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+
+  # Hyperdrive requires origin.password even though hyperdrive.tf ignores changes to it, and the
+  # API never returns it — so it cannot be read back and must be supplied. terraform.tfvars is
+  # gitignored, so CI passes them as TF_VAR_*.
+  TF_VAR_hyperdrive_nonprod_password: ${{ secrets.HYPERDRIVE_NONPROD_PASSWORD }}
+  TF_VAR_hyperdrive_production_password: ${{ secrets.HYPERDRIVE_PRODUCTION_PASSWORD }}
+
+jobs:
+  terraform:
+    name: Validate and plan
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.15.8"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # GitHub resolves a missing secret to an empty string rather than failing, so an unset
+      # secret surfaces much later as a confusing error from whatever consumed it — an absent
+      # R2 key pair, for instance, makes Terraform report "No valid credential sources found"
+      # and start looking for an EC2 instance role. Fail here instead, naming what is missing.
+      - name: Check required secrets
+        run: |
+          missing=""
+          for var in CLOUDFLARE_API_TOKEN AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY \
+                     TF_VAR_hyperdrive_nonprod_password TF_VAR_hyperdrive_production_password; do
+            [ -z "${!var}" ] && missing="$missing $var"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repository secrets for:$missing"
+            echo "Set them under Settings → Secrets and variables → Actions."
+            echo "Note the repo secret names differ from the variables above:"
+            echo "  R2_ACCESS_KEY_ID              -> AWS_ACCESS_KEY_ID"
+            echo "  R2_SECRET_ACCESS_KEY          -> AWS_SECRET_ACCESS_KEY"
+            echo "  HYPERDRIVE_NONPROD_PASSWORD   -> TF_VAR_hyperdrive_nonprod_password"
+            echo "  HYPERDRIVE_PRODUCTION_PASSWORD-> TF_VAR_hyperdrive_production_password"
+            exit 1
+          fi
+          echo "All required secrets are present."
+
+      - name: Formatting
+        run: terraform -chdir=infra fmt -check -recursive -diff
+
+      - name: Init
+        run: terraform -chdir=infra init -input=false
+
+      - name: Validate
+        run: terraform -chdir=infra validate
+
+      # Catches wrangler.toml and Terraform disagreeing about which Hyperdrive config each
+      # environment binds. Reads state only — no Cloudflare API calls.
+      - name: Check wrangler is in sync
+        run: node infra/check-wrangler-sync.mjs
+
+      - name: Plan
+        id: plan
+        run: terraform -chdir=infra plan -input=false -no-color -lock-timeout=5m
+
+      - name: Comment plan on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        env:
+          PLAN: ${{ steps.plan.outputs.stdout }}
+        with:
+          script: |
+            const plan = process.env.PLAN || '';
+            // Plans can exceed GitHub's 65536-character comment limit.
+            const body = plan.length > 60000
+              ? `${plan.slice(0, 60000)}\n\n… truncated, see the workflow log for the full plan.`
+              : plan;
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: [
+                '#### Terraform plan',
+                '',
+                '```terraform',
+                body,
+                '```',
+              ].join('\n'),
+            });
+
+      # Only on merge to main. Applies whatever the plan above showed — read the PR comment
+      # before merging, since this is the point where infrastructure actually changes.
+      - name: Apply
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: terraform -chdir=infra apply -input=false -auto-approve -lock-timeout=5m

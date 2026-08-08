@@ -11,6 +11,7 @@
     "api:dev": "pnpm --filter api start",
     "db:migrate": "dbmate migrate",
     "db:status": "dbmate status",
+    "infra:check": "node infra/check-wrangler-sync.mjs",
     "api:prod:deploy": "pnpm --filter api cf:prod:deploy",
     "api:staging:deploy": "pnpm --filter api cf:stage:deploy",
     "w:api:dev": "pnpm --filter api w:dev",

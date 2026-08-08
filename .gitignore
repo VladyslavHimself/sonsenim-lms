@@ -3,3 +3,18 @@
 .env.local
 node_modules/
 .idea
+
+# Wrangler local secrets — the `wrangler dev` equivalent of .env
+.dev.vars
+.dev.vars.*
+
+# Terraform
+# State holds secrets in plaintext and must never be committed.
+# .terraform.lock.hcl is deliberately NOT ignored — it pins provider hashes and belongs in git.
+infra/.terraform/
+infra/*.tfstate
+infra/*.tfstate.*
+infra/*.tfvars
+!infra/*.tfvars.example
+infra/generated.tf
+crash.log
