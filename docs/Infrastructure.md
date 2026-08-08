@@ -1,341 +1,309 @@
-# Infrastructure as Code (Terraform + Cloudflare)
+# Infrastructure
 
-Plan for putting the Cloudflare infrastructure of Sonsenim under Terraform. Written before
-implementation — treat unimplemented sections as intent, not description.
+How the Cloudflare side of Sonsenim is set up, and how to change it without breaking things.
 
-## Scope: what Terraform owns, and what it does not
+Operational reference, not a tutorial. The step-by-step runbook — installing Terraform, creating
+tokens, importing resources — lives in [infra/README.md](../infra/README.md).
 
-The main failure mode when adding Terraform to a wrangler-based project is having both tools
-manage the same Worker: deploys start returning 409s and `terraform plan` never comes back
-clean. So ownership is split strictly, by resource, with no overlap:
+---
 
-| Tool | Owns |
-|---|---|
-| **Terraform** | Zone settings, DNS records, Hyperdrive configs, Worker routes, Pages project + custom domains, WAF / rate-limit rulesets |
-| **wrangler** | Worker and Pages *code* deploys, `wrangler dev`, `wrangler tail` |
-| **dbmate** | Postgres schema (`db/migrations/`) |
+## 1. Who owns what
 
-Terraform never creates the database — it only creates the Hyperdrive config that points at it.
-Terraform never uploads a Worker script — `wrangler deploy` keeps doing that.
+Three tools touch production. They do **not** overlap, and that is deliberate: two tools managing
+the same resource produces 409s on deploy and a `terraform plan` that never comes back clean.
 
-## Domain map
-
-| Hostname | Serves | Cloudflare resource |
+| Tool | Owns | Never touches |
 |---|---|---|
-| `sonsennim.com` | Landing page | Pages project `sonsennim-lms-landing` (not deployed from this repo) |
-| `learn.sonsennim.com` | The LMS app | Pages project `sonsenim-lms` |
-| `api.sonsennim.com` | API, production | Worker route → `sonsenim-api-production` |
-| `staging-api.sonsennim.com` | API, staging | Worker route → `sonsenim-api-staging` |
-| `dev-api.sonsennim.com` | API, development | Worker route → `sonsenim-api-development` |
+| **Terraform** (`infra/`) | Zone settings, DNS, Worker routes, Hyperdrive configs, Pages project + custom domain, rate limiting | Worker code, Pages deployments, database contents |
+| **wrangler** | Worker code deploys, Worker secrets, `wrangler dev`, `wrangler tail` | Routes, bindings' underlying resources, DNS |
+| **dbmate** | Postgres schema (`db/migrations/`) | Anything in Cloudflare |
 
-The three API routes exist today only as commented-out blocks in
-[apps/api/wrangler.toml](../apps/api/wrangler.toml); they move into Terraform rather than being
-uncommented.
+Terraform creates the Hyperdrive *config* that points at Supabase; it does not create or manage
+the database. Terraform creates the *route* that binds a hostname to a Worker; it does not upload
+the Worker.
 
-### How the UI actually deploys
+If you find yourself about to configure the same thing in two places, stop — that is the failure
+mode this split exists to prevent.
 
-The Pages project `sonsenim-lms` is **git-connected to GitHub** (`VladyslavHimself/sonsenim-lms`)
-and builds on Cloudflare:
+---
 
-| Setting | Value |
+## 2. The map
+
+### Hostnames
+
+| Hostname | Serves | How |
+|---|---|---|
+| `sonsennim.com` | Landing page | Apex CNAME → Pages project `sonsennim-lms-landing` |
+| `learn.sonsennim.com` | The LMS app | CNAME → Pages project `sonsenim-lms`, plus a Pages custom domain |
+| `api.sonsennim.com` | API, production | Proxied CNAME + Worker route → `sonsenim-api-production` |
+| `staging-api.sonsennim.com` | API, staging | Proxied CNAME + Worker route → `sonsenim-api-staging` |
+
+There is no `dev-api` hostname. Development runs locally through `wrangler dev`; the
+`[env.development]` block in `wrangler.toml` exists for that and nothing else.
+
+A hostname needs **both** a proxied DNS record and a Worker route. The route decides which Worker
+serves it. The DNS record's *content* is inert — `api.sonsennim.com` points at
+`sonsenim-api.…workers.dev` while its route sends traffic to `sonsenim-api-production`. Never read
+a binding from the DNS record; read it from the routes API.
+
+### Environments
+
+| | Worker | Hyperdrive config | Database |
+|---|---|---|---|
+| production | `sonsenim-api-production` | `sonsenim-db` (`7db77ce3…`) | Supabase `upvczhfa…` |
+| staging | `sonsenim-api-staging` | `sonsenim-db-staging` (`35c32e96…`) | Supabase `wssxcxgz…` |
+| development | local only | `sonsenim-db-staging` (shared) | **same as staging** |
+
+Development and staging share a database. If that is not what you want, splitting them is now a
+small change — create a second Hyperdrive config and repoint `[env.development]`.
+
+### Resources under Terraform
+
+15 resources: 2 Hyperdrive configs, 1 Pages project, 1 Pages custom domain, 2 Worker routes,
+5 DNS records, 3 zone settings, 1 rate limiting ruleset. `terraform -chdir=infra state list` is
+the authority.
+
+The zone itself is a **data source, not a managed resource** — a `cloudflare_zone` resource means a
+botched config can destroy the zone and every record in it. Read-only lookup cannot.
+
+---
+
+## 3. Credentials
+
+Three separate credentials. Confusing them is the single most common source of lost time here.
+
+| Credential | Used by | Where it lives |
+|---|---|---|
+| `CLOUDFLARE_API_TOKEN` | Terraform provider | Env var; scoped token, see `infra/README.md` |
+| `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` | Terraform state backend (R2) | Env vars; an R2 API token's S3 key pair |
+| wrangler's own OAuth session | `wrangler deploy`, `wrangler secret` | `wrangler login`, cached locally |
+
+**`CLOUDFLARE_API_TOKEN` breaks wrangler.** Wrangler prefers that variable over its own session,
+and the token grants Workers Scripts *Read* by design — so every wrangler write fails with
+`Authentication error [code: 10000]`. Do not widen the token; unset it for the command:
+
+```bash
+env -u CLOUDFLARE_API_TOKEN pnpm api:staging:deploy
+```
+
+Better: export `CLOUDFLARE_API_TOKEN` only in the shell where you run Terraform, not in `~/.zshrc`.
+
+State lives in the R2 bucket `sonsenim-tfstate`. Note R2 required a payment method to enable, even
+for free-tier use; actual usage is a rounding error against the free allowance.
+
+---
+
+## 4. Everyday operations
+
+### Change infrastructure
+
+```bash
+terraform -chdir=infra plan
+```
+
+Read it. Then either apply locally, or commit and open a PR — CI posts the plan as a comment and
+applies on merge to `main`.
+
+**`plan` is also your drift detector.** If it reports changes you did not make, someone clicked
+something in the dashboard. That is the main ongoing value of this setup; run it occasionally even
+when you are not changing anything.
+
+### Deploy the API
+
+Not automated. Terraform manages the routes; you deploy the code:
+
+```bash
+env -u CLOUDFLARE_API_TOKEN pnpm api:staging:deploy
+```
+
+```bash
+env -u CLOUDFLARE_API_TOKEN pnpm api:prod:deploy
+```
+
+Staging first, always — a startup failure (a missing `JWT_SECRET`, say) takes the Worker down
+entirely rather than degrading.
+
+### Deploy the UI
+
+Also not automated, but nothing to run: the Pages project is **git-connected** and Cloudflare
+builds it.
+
+| | Trigger |
 |---|---|
-| Build command | `pnpm run ui:build` |
-| Output directory | `apps/ui/dist` |
-| Production branch | `production` |
-| Preview branches | `main` |
-| Path filter | `apps/ui/*` |
+| Production | merge `main` → `production` |
+| Preview | push to `main` |
 
-So pushing to `production` deploys the UI; pushing to `main` produces a preview.
+Build is `pnpm run ui:build` → `apps/ui/dist`, path-filtered to `apps/ui/*`. Because Cloudflare
+runs the build, `VITE_*` variables must be set as **Pages environment variables** — which Terraform
+manages in [infra/pages.tf](../infra/pages.tf). Setting them in CI would do nothing.
 
-This makes the `cf:stage:deploy` script in [apps/ui/package.json](../apps/ui/package.json) —
-`wrangler pages deploy ./dist --branch main` — a second, parallel deploy path that uploads a
-locally built bundle into the same project. It also names a project that does not exist: the
-script passes no `--project-name`, so wrangler falls back to `"name": "sonsenim-lms-ui"` in
-[apps/ui/wrangler.jsonc](../apps/ui/wrangler.jsonc), and no such project is in the account.
+### Add or rotate a Worker secret
 
-Two things worth reconciling, independently of the Terraform work:
-
-- Point the script at `sonsenim-lms` (or drop it, if git deploys are the intended path) — as it
-  stands it either prompts every time or is one confirmation away from creating a stray third
-  Pages project that no DNS points at.
-- Decide whether local `wrangler pages deploy` should exist at all next to a git-connected
-  project. Mixing direct uploads into a git-built project makes "what is deployed" ambiguous.
-
-### Same-origin alternative worth considering
-
-With the app on `learn.` and the API on `api.`, every authenticated request is cross-origin.
-That is why the auth cookies are set `sameSite: 'none'` in
-[apps/api/src/routes/auth.route.ts](../apps/api/src/routes/auth.route.ts), and why
-`cors()` is currently configured with no origin allowlist (it reflects any origin, with
-credentials enabled).
-
-A Worker route on `learn.sonsennim.com/v1/api/*` would make the API same-origin, which allows
-`sameSite: 'lax'` and a closed CORS policy. This is a routing decision, so Terraform is the
-natural place to make it — but it is a behavioural change to auth, out of scope for the initial
-import. Flagged here so it is a deliberate choice later, not an accident.
-
-## State backend
-
-Terraform keeps a state file mapping config to real resources. It contains secrets in plaintext
-and must never be committed.
-
-**Status: state lives in R2 (migrated 2026-08-07).** Bucket `sonsenim-tfstate`, via the
-S3-compatible backend configured in [infra/versions.tf](../infra/versions.tf).
-
-Milestones 1–4 ran on local state, which was fine for one operator with no concurrency. It moved
-to R2 with a single `terraform init -migrate-state` once CI became the goal, since CI has no local
-file.
-
-Two things worth knowing about this choice:
-
-- **R2 requires a payment method on file**, even to use only the free tier. Usage here is
-  genuinely free — a state file is a few hundred KB against a 10 GB allowance, and a plan costs a
-  handful of operations against a million — but the card is not optional. HCP Terraform's free
-  tier is the alternative if that ever becomes unwelcome.
-- **Credentials are separate from `CLOUDFLARE_API_TOKEN`.** The backend authenticates with an R2
-  API token's S3 key pair (`AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`). Cloudflare's own
-  documentation puts these inline in the `.tf` file; they are read from the environment here
-  instead, because that file is committed.
-
-## Layout
-
-```
-infra/
-├── README.md            # runbook: install, token scopes, import workflow  [exists]
-├── versions.tf          # provider pin ~> 5.23, required_version >= 1.9    [exists]
-├── variables.tf         # account_id, zone_name                            [exists]
-├── zone.tf              # sonsennim.com lookup (data source)               [exists]
-├── imports.tf           # import blocks for existing infrastructure        [exists]
-├── outputs.tf           # zone_id; hyperdrive ids once imported            [exists]
-├── terraform.tfvars.example                                                [exists]
-├── hyperdrive.tf        # generated during import (milestone 2)
-├── pages.tf             # generated during import (milestone 2)
-├── dns.tf               # landing, learn, api hostnames    (milestone 3)
-├── worker_routes.tf     # api hostnames → workers          (milestone 3)
-└── zone_settings.tf     # ssl, always_use_https, min_tls   (milestone 3)
+```bash
+env -u CLOUDFLARE_API_TOKEN pnpm --filter api exec wrangler secret put NAME --env staging
 ```
 
-The zone is a **data source, not a managed resource**. A `cloudflare_zone` resource puts the zone
-itself under Terraform's control, so a botched import or a deleted config block can take out the
-zone and every record in it. Read-only lookup carries no such risk; promoting it to managed is a
-deliberate later decision.
+Rotating `JWT_SECRET` logs every user out — tokens signed with the old secret stop validating.
 
-Single state with environment as a variable, rather than separate root modules per environment —
-at this size, separate directories add ceremony without buying isolation.
-
-No `modules/` directory: Cloudflare explicitly recommends against wrapping provider v5 resources
-in modules, since the provider is generated from OpenAPI and modules fight its schema.
-
-## Milestones
-
-### 1 — Bootstrap
-
-- Install `terraform` (or OpenTofu) and `cf-terraforming`.
-- Create a scoped API token — **not** the global API key:
-  - Account: Workers Scripts:Edit, Hyperdrive:Edit, Pages:Edit
-  - Zone (`sonsennim.com`): DNS:Edit, Zone Settings:Edit, Workers Routes:Edit
-- Export as `CLOUDFLARE_API_TOKEN`. Never written to a file, never a Terraform variable default.
-- Add `infra/*.tfstate*`, `infra/.terraform/`, `*.tfvars` holding secrets to `.gitignore`.
-
-**Done when:** `terraform init && terraform plan` runs clean against an empty config.
-
-### 2 — Import what already exists
-
-The critical step. Terraform assumes anything in config but not in state must be *created*, and
-anything in state but not in config must be *destroyed* — so importing wrong can delete live
-infrastructure.
-
-- Use Terraform 1.5+ `import` blocks (declarative, reviewable in a diff) rather than the
-  imperative `terraform import` command.
-- Draft HCL with `terraform plan -generate-config-out=generated.tf`, then hand-clean it —
-  generated config is verbose and often has wrong-but-valid defaults.
-- Import: the zone, existing DNS records (including whatever serves the landing page), both
-  Hyperdrive configs, the Pages project.
-
-**Done when:** `terraform plan` reports **zero changes**. Nothing proceeds until that holds.
-
-Two things will get in the way of that, both documented with fixes in
-[infra/README.md](../infra/README.md): Hyperdrive's `origin.password` is write-only so the API
-never returns it (needs `ignore_changes`), and the provider refuses to import a Pages project that
-has secret environment variables set.
-
-**Status: done (2026-08-07).** Applied as `3 imported, 0 added, 0 changed, 0 destroyed` — the
-Hyperdrive configs and the Pages project are under management with nothing altered at Cloudflare.
-
-### 3 — Add what is missing
-
-Almost nothing here needs creating — the hostnames already exist and work. Verified 2026-08-07:
-both `api.sonsennim.com` and `staging-api.sonsennim.com` serve the Elysia app (checked via
-`/v1/api/openapi`). This milestone is about bringing them under management, not building them.
-
-- Import the two Worker routes. They already exist — created in the dashboard, despite being
-  commented out in [apps/api/wrangler.toml](../apps/api/wrangler.toml) — and are correctly bound:
-  `api.sonsennim.com/*` → `sonsenim-api-production`, `staging-api.sonsennim.com/*` →
-  `sonsenim-api-staging`.
-  - These are routes, **not** Workers Custom Domains. The only custom domain in the account
-    belongs to an unrelated project. The distinction matters: a route is a separate resource from
-    the DNS record it rides on, so both get imported.
-  - The CNAME *content* does not name the Worker serving the hostname. `api.sonsennim.com`
-    displays `sonsenim-api.…workers.dev` while the route sends it to `sonsenim-api-production`.
-    Read bindings from the routes API, never from the DNS record.
-- Import `learn.sonsennim.com` as a `cloudflare_pages_domain` — it is **already attached** to the
-  Pages project and serving production traffic, so this is an import, not a create.
-- Import the existing DNS records, including the apex CNAME to the landing project and the Google
-  site-verification TXT record.
-**Two scope decisions, settled 2026-08-07:**
-
-- **No `dev-api.sonsennim.com`.** Development runs locally via `wrangler dev`, so it needs no
-  public hostname. The commented-out `dev-api` route in `wrangler.toml` describes an environment
-  that was never wanted remotely. The `[env.development]` block itself stays — it is what local
-  `wrangler dev --env development` uses.
-- **The landing project stays outside Terraform.** `sonsennim-lms-landing` is not deployed from
-  this repo and is maintained separately. Its *DNS record* is managed here, since the zone is —
-  so Terraform controls where the apex points, while the project it points at is someone else's
-  concern. Adopting the project later is a one-block change (see `infra/imports.tf`).
-- Zone settings: `ssl = "strict"`, `always_use_https = "on"`, `min_tls_version = "1.2"`.
-
-**Open question:** staging and development share Hyperdrive config
-`35c32e963c7a43fc807e4fabad65947b` (`sonsenim-db-staging`, Supabase project `wssxcxgz…`), so they
-share one database. Production is properly separate (`sonsenim-db`, Supabase project
-`upvczhfa…`) — it is only dev and staging that are entangled. If that is not deliberate, it is a
-small change now that the configs are in Terraform.
-
-**Status: done (2026-08-07).** Applied in two passes: `8 imported, 0 changed` for the routes, DNS
-records and Pages domain, then `3 imported, 2 changed` for zone settings.
-
-The zone-settings pass was the first and so far only change this configuration has made to live
-infrastructure: `always_use_https` off→on and `min_tls_version` 1.0→1.2. Both verified afterwards
-— the API had been answering plaintext http with a 200 and now redirects, and TLS 1.0/1.1
-handshakes are refused.
-
-### 4 — Close the Terraform → wrangler loop
-
-**Status: done (2026-08-07).**
-
-Hyperdrive IDs are hardcoded in [apps/api/wrangler.toml](../apps/api/wrangler.toml), while
-Terraform owns the configs themselves — the same ID written in two places, with nothing keeping
-them honest. Recreating a Hyperdrive config assigns a new ID, and the next deploy would bind to
-one that no longer exists: the Worker starts fine and fails on its first query.
-
-Two ways to fix that, and the obvious one was not chosen:
-
-- **Generate** `wrangler.toml` from a tracked template via `envsubst`, gitignoring the result.
-  One source of truth, but every `wrangler dev` and every deploy depends on the generate step
-  having run, and CI needs a Cloudflare token merely to read outputs. That is real, permanent
-  friction traded against a rare failure.
-- **Verify** — what is implemented. `pnpm infra:check` reads `terraform output` and the toml and
-  fails if they disagree. The ID still lives in two places, but divergence becomes loud instead
-  of silent, and nothing about local development changes.
+### Check wrangler and Terraform agree
 
 ```bash
 pnpm infra:check
 ```
 
-Reads Terraform outputs rather than the Cloudflare API, so it needs no `CLOUDFLARE_API_TOKEN`. It
-does need the state backend's credentials now that state lives in R2 — this was credential-free
-while state was local, and moving the backend quietly changed that.
+`wrangler.toml` hardcodes the Hyperdrive IDs that Terraform manages — the same value in two places.
+This fails loudly if they diverge. Needs the R2 credentials, since it reads Terraform outputs
+through the state backend.
 
-The script ([infra/check-wrangler-sync.mjs](../infra/check-wrangler-sync.mjs)) treats "found no
-Hyperdrive bindings at all" as a failure rather than a pass. A check that silently succeeds when
-it cannot find what it is checking is worse than no check.
+### Bring an existing Cloudflare resource under management
 
-### 5 — CI
+Never write the config by hand and apply — Terraform would try to *create* something that already
+exists. Add an `import` block, then:
 
-[.github/workflows/terraform.yml](../.github/workflows/terraform.yml): `fmt -check`, `init`,
-`validate`, `pnpm infra:check` and `plan` on pull requests with the plan posted as a comment;
-`apply` on merge to `main`. Runs are serialised through a concurrency group, since two concurrent
-applies would contend for the state lock.
+```bash
+terraform -chdir=infra plan -generate-config-out=generated.tf
+```
 
-**Five repository secrets are required.** This is more than it looks like it should be, and each
-one has a reason:
+Move the generated HCL into a real file, trim it, delete `generated.tf` and the import block. The
+bar is a plan reporting **0 to change** before you apply. Full procedure in `infra/README.md`.
+
+---
+
+## 5. CI
+
+[.github/workflows/terraform.yml](../.github/workflows/terraform.yml) runs on changes to `infra/**`,
+`apps/api/wrangler.toml`, or itself.
+
+| Event | What happens |
+|---|---|
+| Pull request | secrets preflight → `fmt` → `init` → `validate` → `infra:check` → `plan`, posted as a PR comment |
+| Merge to `main` | the same, then `apply -auto-approve` |
+
+**Merging to `main` does not deploy anything.** It converges infrastructure only. The API Worker
+still needs a manual `wrangler deploy`; the UI needs a merge into `production`. This is the easiest
+thing to get wrong — merging an API change and assuming it shipped.
+
+Five repository secrets are required. Each has a reason:
 
 | Secret | Why |
 |---|---|
-| `CLOUDFLARE_API_TOKEN` | Provider authentication |
-| `R2_ACCESS_KEY_ID` | State backend — a *separate* credential from the token above |
+| `CLOUDFLARE_API_TOKEN` | Provider auth |
+| `R2_ACCESS_KEY_ID` | State backend — a *different* credential from the token above |
 | `R2_SECRET_ACCESS_KEY` | State backend |
-| `HYPERDRIVE_NONPROD_PASSWORD` | `origin.password` is required by the provider but never returned by the API, so it cannot be read back from the live config |
+| `HYPERDRIVE_NONPROD_PASSWORD` | `origin.password` is required by the provider but never returned by the API, so it cannot be recovered from the live config |
 | `HYPERDRIVE_PRODUCTION_PASSWORD` | as above |
 
-`account_id` is deliberately **not** a secret — it identifies, it does not authenticate, and it is
-defaulted in `variables.tf`.
+`account_id` is deliberately not a secret — it identifies, it does not authenticate.
 
-The Hyperdrive passwords could be avoided by defaulting those variables to `""`, since
-`ignore_changes` means Terraform never pushes them. That trades two secrets for a config that
-would silently write an empty password if a Hyperdrive config were ever recreated. Not worth it.
+A missing secret resolves to an empty string rather than failing, so the workflow checks all five
+up front and names what is absent. Without that, an unset R2 key surfaces as Terraform hunting for
+an EC2 instance role.
 
-The UI needs no deploy job: its Pages project is git-connected and Cloudflare builds it.
+Two accepted limitations: `apply` re-plans rather than applying the plan reviewed on the PR (fine
+for one person, fix with `plan -out` + artifact if that changes), and there is no approval gate
+before apply.
 
-**Note:** The UI does not need a deploy step in CI. The Pages project is **git-connected**, and
-Cloudflare builds it itself (`pnpm run ui:build` → `apps/ui/dist`) — `production` branch for
-production, `main` for previews, scoped to `apps/ui/*`. Pushing is the deploy.
+---
 
-`VITE_*` variables are baked into the bundle at build time, and since Cloudflare runs that build,
-they must be set as **Pages environment variables**, which Terraform manages via
-`deployment_configs`. CI only needs to deploy the API Worker.
+## 6. Gotchas that cost time
 
-### 6 — Follow-ons
+### Provider v5 is not v4
 
-**Rate limiting** — [infra/rate_limit.tf](../infra/rate_limit.tf). 10 requests per minute per IP
-to `/v1/api/auth/login` and `/register`, then blocked for 60 seconds.
+Verified against the [provider's generated docs](https://github.com/cloudflare/terraform-provider-cloudflare/tree/main/docs/resources)
+at v5.23.0. Most examples online are wrong in at least one of these ways:
 
-Scoped to those two paths only. `/auth/refresh` is deliberately excluded: clients call it every
-time a 15-minute access token expires, so a per-IP limit would punish users behind a shared NAT
-for using the app normally. Note the counter is per Cloudflare data centre (`ip.src` +
-`cf.colo.id` is the characteristic pair available below Enterprise), so a distributed attacker
-gets a higher effective global limit — it stops single-source guessing, not a botnet.
+- **Attribute syntax, not blocks**: `origin = { … }`, never `origin { … }`. v4 examples will not parse.
+- `cloudflare_workers_route` takes `script`, not `script_name`.
+- `cloudflare_zone_settings_override` is gone — v5 has one `cloudflare_zone_setting` per setting.
+- `cloudflare_record` → `cloudflare_dns_record`; `cloudflare_worker_*` → `cloudflare_workers_*`.
+- `ttl` is required on DNS records; `1` means automatic.
 
-**Cloudflare Access on staging** — [infra/access.tf](../infra/access.tf). Written, and **disabled
-by default** via `enable_staging_access`.
+Import ID formats differ by resource: `<account_id>/<name>` for Hyperdrive and Pages,
+`<zone_id>/<id>` for DNS records and Worker routes.
 
-Access redirects unauthenticated browser requests to an identity provider. That suits a site you
-navigate to, and breaks an API called by JavaScript from another origin: the staging UI's XHR
-would meet a login redirect instead of JSON, surfacing as an opaque CORS failure. Enabling it
-needs the staging client to authenticate with an Access service token first. Worth weighing
-against the fact that staging shares a database with development — if that data is synthetic,
-the exposure may not justify the friction.
+### Write-only attributes
 
-**JWT signing secret** — was the literal string `'supersecret'` in
-[apps/api/src/plugins/jwt.ts](../apps/api/src/plugins/jwt.ts), in a public repository. Anyone who
-read it could mint a valid token for any user.
+`hyperdrive_config.origin.password` is never returned by the API. It is required by the provider,
+cannot be read back, and cannot be generated by `-generate-config-out`. Hence
+`ignore_changes = [origin.password]`.
 
-It now comes from `JWT_SECRET`: a Worker secret binding in deployed environments (surfaced on
-`process.env` by the `nodejs_compat_populate_process_env` flag already set in `wrangler.toml`),
-and `.env` under Bun locally. A missing secret is fatal at startup rather than falling back to a
-default — an API that refuses to boot is a better outcome than one that runs and issues forgeable
-tokens.
+**This is a live hazard.** `ignore_changes` suppresses *diffs*, but the API takes `origin` as a
+whole object — so any update to another attribute sends the whole block, password included. If
+`terraform.tfvars` holds an empty password, that update would overwrite the real database
+credential. Keep the real values in `terraform.tfvars`.
 
-**Rotating the secret invalidates every existing session.** All users are logged out on deploy.
-That is unavoidable: the old tokens were signed with a secret that is public, and continuing to
-honour them is the vulnerability.
+### Plan entitlements are narrower than the docs
 
-## Known gotchas
+Rate limiting on this plan: `period` must be `10`, `mitigation_timeout` must be exactly `10` and
+cannot be omitted (`0` means throttling, not permitted), and `cf.colo.id` is mandatory in
+`characteristics`. The documented value lists are Enterprise's.
 
-Verified against the provider's own generated docs at v5.23.0
-([source](https://github.com/cloudflare/terraform-provider-cloudflare/tree/main/docs/resources)).
-Most v5 examples found online are wrong in at least one of these ways:
+Errors are inconsistent — a rejected `period` gives a clear message, a rejected
+`mitigation_timeout` can surface as a generic `403 Authentication error` that reads like an auth
+failure.
 
-- **Attribute syntax, not blocks.** v5 is generated from Cloudflare's OpenAPI spec, so nested
-  structures are attributes: `origin = { … }`, not `origin { … }`. v4-era examples use blocks
-  throughout and will not parse.
-- **`cloudflare_workers_route` takes `script`**, not `script_name`.
-- **`cloudflare_zone_settings_override` no longer exists.** v5 replaced it with
-  `cloudflare_zone_setting` — one resource per setting, keyed by `setting_id`.
-- **Resource renames from v4:** `cloudflare_record` → `cloudflare_dns_record`,
-  `cloudflare_worker_*` → `cloudflare_workers_*` (plural).
-- **`ttl` is required** on `cloudflare_dns_record`; `1` means automatic.
+### "Applied successfully" is not "working"
 
-Import ID formats differ per resource and are easy to get wrong:
-`cloudflare_hyperdrive_config` and `cloudflare_pages_project` take `<account_id>/<name-or-id>`,
-while `cloudflare_dns_record` and `cloudflare_workers_route` take `<zone_id>/<record-or-route_id>`.
+Rate limit counters are per-colo and converge lazily. Against the live rule, a burst of 60 requests
+got its first 429 at **request 44**, against a nominal threshold of 5 per 10 seconds. A dozen
+unblocked requests is not evidence the rule is broken.
 
-Other things to expect:
+Generally: verify infrastructure by sending traffic through it, not by reading the apply output.
 
-- **Pages project drift.** `cloudflare_pages_project.deployment_configs` diffs perpetually because
-  the Cloudflare API injects defaults Terraform did not set. The usual fix is
-  `lifecycle { ignore_changes = [deployment_configs] }` — but that blanket-ignores env vars too.
-  Scope the ignore to the specific attributes that actually drift; check the real plan output
-  before reaching for it.
-- **Pin the provider** with `~>` — v5 is generated from Cloudflare's OpenAPI spec and minor
-  releases move faster than hand-maintained providers.
-- **Never run Terraform and wrangler against the same Worker.** See the ownership table above.
+### Pages projects
+
+The provider cannot import a Pages project that has *secret* environment variables — remove them
+first. And `deployment_configs` can drift, because the API injects defaults; scope any
+`ignore_changes` narrowly rather than blanket-ignoring the block, which would also stop Terraform
+managing your `VITE_*` variables.
+
+---
+
+## 7. Current security posture
+
+| | State |
+|---|---|
+| TLS | `ssl = strict`, `always_use_https = on`, `min_tls_version = 1.2` |
+| Auth rate limiting | 5 requests / 10s per IP per colo on `/v1/api/auth/login` and `/register`, 10s block — see caveat above |
+| JWT signing secret | Worker secret binding, fatal at startup if absent |
+| Staging API | Public. Cloudflare Access is written but disabled — see below |
+
+Rate limiting here is a speed bump against naive scripted guessing, not brute-force protection: the
+counter is per data centre and the practical threshold is far above the nominal one. Real
+protection would be **username-keyed backoff in the API**, which no plan entitlement can weaken and
+IP rotation cannot sidestep. That does not exist yet.
+
+---
+
+## 8. Open items
+
+**Deliberately not done:**
+
+- **Cloudflare Access on staging** ([infra/access.tf](../infra/access.tf), `enable_staging_access`
+  defaults to `false`). Access redirects unauthenticated browser requests to an IdP, which breaks
+  cross-origin XHR from the staging UI — it would fail as an opaque CORS error. Enabling it needs
+  the staging client to carry an Access service token first.
+- **The landing project** stays outside Terraform. Its DNS record is managed here, since the zone
+  is; the project is maintained separately. Consequence: if it were deleted elsewhere, the apex
+  would point at nothing and Terraform would not know.
+
+**Worth fixing:**
+
+- **`AuthError` → 500.** [AuthException.ts](../apps/api/src/exceptions/AuthException.ts) carries a
+  `status` nothing reads, and `app.ts` registers no `onError`, so a wrong username returns 500
+  instead of 404. Affects decks, cards and groups too — they share the shape.
+- **Username-keyed login throttling**, per section 7.
+- **`apps/ui/wrangler.jsonc`** names `sonsenim-lms-ui`, a project that does not exist, and
+  `cf:stage:deploy` is a second deploy path into a git-built project — ambiguous about what is
+  actually deployed.
+- **`apps/api` has never typechecked**: `tsconfig.json` names `bun-types` while `@types/bun` is
+  installed, so `tsc` aborts before checking. Fixing it reveals 32 accumulated errors.
+
+**Worth considering:**
+
+- **Same-origin API.** The app on `learn.` and the API on `api.` makes every authenticated request
+  cross-origin — which is why auth cookies are `sameSite: 'none'` and `cors()` has no origin
+  allowlist. A Worker route on `learn.sonsennim.com/v1/api/*` would allow `sameSite: 'lax'` and a
+  closed CORS policy. A routing change, so Terraform's job — but it changes auth behaviour.
+- **A separate CI token.** CI currently uses the same token as your laptop. Scoping a second one
+  identically would let you revoke either independently.
